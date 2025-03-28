@@ -1,6 +1,8 @@
 const { getDB } = require("../db/mongoClient");
 const { ObjectId } = require("mongodb");
 
+
+
 // GET all media files
 const getAllMediaFiles = async (req, res) => {
   try {
@@ -12,6 +14,7 @@ const getAllMediaFiles = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch media files" });
   }
 };
+
 
 // GET a single media file by media_id
 const getMediaFileByMedId = async (req, res) => {
@@ -34,7 +37,8 @@ const getMediaFileByMedId = async (req, res) => {
   }
 };
 
-// POST new media file
+
+// POST upload new media file
 const createMediaFile = async (req, res) => {
   try {
     const db = getDB();
@@ -51,14 +55,15 @@ const createMediaFile = async (req, res) => {
   }
 };
 
-// PUT update media file metadata by _id
+
+// PUT update media file metadata by media_id
 const updateMediaFile = async (req, res) => {
   try {
     const db = getDB();
-    const id = req.params.id;
+    const id = req.params.media_id;
 
     if (!ObjectId.isValid(id)) {
-      return res.status(400).json({ error: "Invalid ObjectId format" });
+      return res.status(400).json({ error: "Invalid media id" });
     }
 
     const updateData = req.body;
@@ -79,11 +84,12 @@ const updateMediaFile = async (req, res) => {
   }
 };
 
-// DELETE a media file by _id
+
+// DELETE a media file by media_id
 const deleteMediaFile = async (req, res) => {
   try {
     const db = getDB();
-    const id = req.params.id;
+    const id = req.params.media_id;
 
     if (!ObjectId.isValid(id)) {
       return res.status(400).json({ error: "Invalid ObjectId format" });
@@ -103,6 +109,7 @@ const deleteMediaFile = async (req, res) => {
     res.status(500).json({ error: "Failed to delete media file" });
   }
 };
+
 
 // Export the controller functions
 module.exports = {
