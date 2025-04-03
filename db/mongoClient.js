@@ -16,7 +16,7 @@ const connectToDatabase = async () => {
         db = client.db(dbname);  
         console.log(`Connected to the ${dbname} database`);
     } catch (err) {
-        console.error(`Error connecting to the database: ${err}`);
+        console.error("Error connecting to the database:", err);
     }
 };
 

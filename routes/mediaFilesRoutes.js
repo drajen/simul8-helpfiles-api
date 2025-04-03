@@ -11,13 +11,17 @@ const {
 // Define the routes
 router.get("/", getAllMediaFiles);
 
+// Get a single media file by media_id
 router.get("/media_id/:media_id", getMediaFileByMedId);
 
+// Upload a new media file
 router.post("/upload", createMediaFile);
 
-router.put("/:id", updateMediaFile);
+// Update media file metadata by media_id
+router.put("/media_id/:media_id", updateMediaFile);
 
-router.delete("/:id", deleteMediaFile);
+// Delete a media file by media_id
+router.delete("/:media_id", deleteMediaFile);
 
 
 // Export the router

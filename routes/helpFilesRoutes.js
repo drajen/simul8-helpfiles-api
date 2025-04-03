@@ -11,13 +11,17 @@ const {
 // Define the routes
 router.get("/", getAllHelpFiles);
 
+// Get a single help file by document_id
 router.get("/document_id/:document_id", getHelpFileByDocId);
 
+// Create a new help file
 router.post("/", createHelpFile);
 
-router.put("/:id", updateHelpFile);
+// Update a help file by document_id
+router.put("/:document_id", updateHelpFile);
 
-router.delete("/:id", deleteHelpFile);
+// Delete a help file by document_id
+router.delete("/:document_id", deleteHelpFile);
 
 
 // Export the router
