@@ -157,6 +157,21 @@ const deleteHelpFile = async (req, res) => {
   }
 };
 
+// Search help files by tag
+const searchHelpFilesByTag = async (req, res) => {
+  try {
+    const db = getDB();
+    const tag = req.query.tag;
+    if (!tag) {
+      return res.status(400).json({ error: "Tag parameter is required" });
+    }
+    const results = await db.collection("HelpFiles").find({ tags: tag }).toArray();
+    res.status(200).json(results);
+  } catch (err) {
+    console.error("Error searching HelpFiles:", err);
+    res.status(500).json({ error: "Failed to search HelpFiles" });
+  }
+};
 
 // Export the controller functions
 module.exports = {
@@ -165,4 +180,5 @@ module.exports = {
   createHelpFile,
   updateHelpFile,
   deleteHelpFile,
+  searchHelpFilesByTag,
 };

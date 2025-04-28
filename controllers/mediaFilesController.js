@@ -157,6 +157,21 @@ const deleteMediaFile = async (req, res) => {
   }
 };
 
+// Search media files by tag
+const searchMediaFilesByTag = async (req, res) => {
+  try {
+    const db = getDB();
+    const tag = req.query.tag;
+    if (!tag) {
+      return res.status(400).json({ error: "Tag parameter is required" });
+    }
+    const results = await db.collection("MediaFiles").find({ tags: tag }).toArray();
+    res.status(200).json(results);
+  } catch (err) {
+    console.error("Error searching MediaFiles:", err);
+    res.status(500).json({ error: "Failed to search MediaFiles" });
+  }
+};
 
 // Export the controller functions
 module.exports = {
@@ -165,4 +180,5 @@ module.exports = {
   createMediaFile,
   updateMediaFile,
   deleteMediaFile,
+  searchMediaFilesByTag,
 };

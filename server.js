@@ -14,6 +14,9 @@ app.use("/api/helpfiles", helpFilesRoutes);
 const mediaFilesRoutes = require("./routes/mediaFilesRoutes");
 app.use("/api/mediafiles", mediaFilesRoutes);
 
+const authRoutes = require("./routes/authRoutes");
+app.use("/api/auth", authRoutes);
+
 // TODO: Route hooks will go here
 
 connectToDatabase().then(() => {

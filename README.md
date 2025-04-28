@@ -16,12 +16,19 @@ This API is not yet public-facing and is intended for internal testing, research
 - MongoDB Atlas
 - Postman API for testing
 
-## Features (Phase 1 - Complete)
+## Features
+Phase 1 - Complete
 - Full CRUD for Help Files ("/api/helpfiles")
 - Full CRUD for Media Files ("/api/mediafiles")
 - Structured API responses
 - Connection to MongoDB via Node.js driver
 - Modular file structure
+
+Phase 2 - In Progress
+- JWT-based Authentication (Login, Logout, Protected Routes)
+- Basic Role-Based Access Control (Admin, Editor)
+- Input Validation (express-validator)
+- Search Help Files and Media Files by Tag
 
 ## Testing
 All endpoints have been tested via Postman.  

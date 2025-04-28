@@ -23,6 +23,15 @@ router.put("/media_id/:media_id", updateMediaFile);
 // Delete a media file by media_id
 router.delete("/:media_id", deleteMediaFile);
 
+// Import the media file validation middleware
+const { validateMediaFiles } = require("../middleware/mediaFilesValidator");
+// Apply the validation middleware to the POST and PUT routes
+router.post("/upload", validateMediaFiles, createMediaFile);
+router.put("/:media_id", validateMediaFiles, updateMediaFile);
+
+// Search media files by tag
+const { searchMediaFilesByTag } = require("../controllers/mediaFilesController");
+router.get("/search", searchMediaFilesByTag);
 
 // Export the router
 module.exports = router;

@@ -23,6 +23,9 @@ router.put("/:document_id", updateHelpFile);
 // Delete a help file by document_id
 router.delete("/:document_id", deleteHelpFile);
 
+// Search help files by tag
+const { searchHelpFilesByTag } = require("../controllers/helpFilesController");
+router.get("/search", searchHelpFilesByTag);
 
 // Export the router
 module.exports = router;
