@@ -1,31 +1,34 @@
 const express = require("express");
 const router = express.Router();
+
 const {
-    getAllHelpFiles,
-    getHelpFileByDocId,
-    createHelpFile,
-    updateHelpFile,
-    deleteHelpFile,
+  getAllHelpFiles,
+  getHelpFileByDocId,
+  createHelpFile,
+  updateHelpFile,
+  deleteHelpFile,
+  searchHelpFilesByTag
 } = require("../controllers/helpFilesController");
 
-// Define the routes
+const { helpFilesValidationRules } = require("../middleware/helpFilesValidator");
+const { validateRequest } = require("../middleware/validateRequest");
+
+// GET all help files
 router.get("/", getAllHelpFiles);
 
-// Get a single help file by document_id
+// GET a single help file by document_id
 router.get("/document_id/:document_id", getHelpFileByDocId);
 
-// Create a new help file
-router.post("/", createHelpFile);
-
-// Update a help file by document_id
-router.put("/:document_id", updateHelpFile);
-
-// Delete a help file by document_id
-router.delete("/:document_id", deleteHelpFile);
-
-// Search help files by tag
-const { searchHelpFilesByTag } = require("../controllers/helpFilesController");
+// SEARCH help files by tag
 router.get("/search", searchHelpFilesByTag);
 
-// Export the router
+// POST create new help file (with validation)
+router.post("/", helpFilesValidationRules, validateRequest, createHelpFile);
+
+// PUT update help file by document_id (with validation)
+router.put("/:document_id", helpFilesValidationRules, validateRequest, updateHelpFile);
+
+// DELETE a help file by document_id
+router.delete("/:document_id", deleteHelpFile);
+
 module.exports = router;

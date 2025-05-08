@@ -22,13 +22,19 @@ Phase 1 - Complete
 - Full CRUD for Media Files ("/api/mediafiles")
 - Structured API responses
 - Connection to MongoDB via Node.js driver
-- Modular file structure
+- Modular file structure (controllers, routes, middleware)
 
-Phase 2 - In Progress
-- JWT-based Authentication (Login, Logout, Protected Routes)
-- Basic Role-Based Access Control (Admin, Editor)
-- Input Validation (express-validator)
-- Search Help Files and Media Files by Tag
+Phase 2 - Complete
+- JWT-based authentication (Login, Logout, Protected Routes)
+- Basic role-based access control (Admin, Editor)
+- Input validation (express-validator)
+- Search Help Files and Media Files by tag
+
+Phase 3 - In Progress
+- Markdown/text file parsing and conversion to JSON
+- Help Files preprocessing for search indexing
+- Integration planning for Atlas Search and custom filter endpoints
+- Basic version control to track changes (optional)
 
 ## Testing
 All endpoints have been tested via Postman.  
