@@ -31,4 +31,8 @@ router.put("/:document_id", helpFilesValidationRules, validateRequest, updateHel
 // DELETE a help file by document_id
 router.delete("/:document_id", deleteHelpFile);
 
+// Preview a help file by document_id
+const { previewHelpFile } = require("../controllers/helpFilesController");
+router.get("/preview/:document_id", previewHelpFile);
+
 module.exports = router;

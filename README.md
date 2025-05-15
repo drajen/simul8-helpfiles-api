@@ -30,22 +30,23 @@ Phase 2 - Complete
 - Input validation (express-validator)
 - Search Help Files and Media Files by tag
 
-Phase 3 - In Progress
-- Markdown/text file parsing and conversion to JSON
-- Help Files preprocessing for search indexing
-- Integration planning for Atlas Search and custom filter endpoints
-- Basic version control to track changes (optional)
+Phase 3 - Complete
+- Markdown-to-HTML parsing using markdown-it
+- /preview/:document_id endpoint for live HTML rendering
+- Preprocessing support for search/display
+
+## Next Steps (Phase 4 – In Progress)
+- Add export functionality (Markdown, JSON)
+- Build conversion middleware (JSON ↔ Markdown)
+- Implement Atlas Search integration and indexing
+- Create custom filter endpoints for search (e.g., by tag, category)
+- Introduce basic version control or audit logging for updates/deletes
 
 ## Testing
 All endpoints have been tested via Postman.  
 Test collections are saved in a shared **Postman Workspace**.
 
-## Next Steps
-- Enhance response messages with field-level updates
-- Implement basic change tracking or audit logs
-- Add authentication and access control (JWT/RBAC)
-- Build conversion middleware (JSON ↔ Markdown)
-- Add export functionality (Markdown, JSON)
+
 
 ## Private Repository
 This repository contains internal development code for academic and team review.  

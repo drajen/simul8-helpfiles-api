@@ -173,6 +173,33 @@ const searchHelpFilesByTag = async (req, res) => {
   }
 };
 
+const { parseMarkdownToHtml } = require('../utils/parseMarkdown');
+
+// GET /api/helpfiles/preview/:document_id
+const previewHelpFile = async (req, res) => {
+  try {
+    const db = getDB();
+    const docId = req.params.document_id;
+
+    const file = await db.collection("HelpFiles").findOne({ document_id: docId });
+    if (!file) return res.status(404).json({ message: "Help file not found" });
+
+    const parsedSections = file.content_sections.map(section => ({
+      section_title: section.section_title,
+      html: parseMarkdownToHtml(section.text)
+    }));
+
+    res.status(200).json({
+      document_id: file.document_id,
+      title: file.title,
+      parsed_sections: parsedSections
+    });
+  } catch (err) {
+    console.error("Markdown parsing error:", err);
+    res.status(500).json({ error: "Failed to parse markdown" });
+  }
+};
+
 // Export the controller functions
 module.exports = {
   getAllHelpFiles,
@@ -181,4 +208,5 @@ module.exports = {
   updateHelpFile,
   deleteHelpFile,
   searchHelpFilesByTag,
+  previewHelpFile,
 };
