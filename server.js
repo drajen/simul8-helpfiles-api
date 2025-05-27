@@ -25,6 +25,12 @@ app.use("/api/mediafiles", mediaFilesRoutes);
 const authRoutes = require("./routes/authRoutes");
 app.use("/api/auth", authRoutes);
 
+const uploadRoutes = require("./routes/uploadRoutes");
+app.use("/api/files", uploadRoutes);
+
+const exportRoutes = require("./routes/exportRoutes");
+app.use("/api/export", exportRoutes);
+
 // DB and Server start
 connectToDatabase().then(() => {
   app.listen(process.env.PORT || 5050, () => {

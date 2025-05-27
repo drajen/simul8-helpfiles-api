@@ -1,6 +1,6 @@
 const { getDB } = require("../db/mongoClient");
 const { ObjectId } = require("mongodb");
-
+const { logChange } = require("./changeLogController");
 
 
 // Get all help files
@@ -80,6 +80,9 @@ const updateHelpFile = async (req, res) => {
     //if (!ObjectId.isValid(id)) {
     //  return res.status(400).json({ error: "Invalid document_id entered" });
     //}
+    const existingDoc = await db.collection("HelpFiles").findOne(
+      { document_id: id }
+    );
     
     const result = await db.collection("HelpFiles").updateOne(
       { document_id: id },
@@ -110,6 +113,16 @@ const updateHelpFile = async (req, res) => {
     // Shows the updated help file in full
     // and what was updated
     const updatedDoc = await db.collection("HelpFiles").findOne({ document_id: id });
+ 
+    // Log the change
+    await logChange({
+      action: "update",
+      collection: "HelpFiles",
+      document_id: id,
+      oldData: existingDoc,
+      newData: updateData
+    });
+
     res.status(200).json({
       message: `Help file with document_id '${id}' updated successfully`,
       updatedFields: updateData,
@@ -132,6 +145,11 @@ const deleteHelpFile = async (req, res) => {
    // if (!ObjectId.isValid(id)) {
     //  return res.status(400).json({ error: "Invalid document id" });
    // }
+
+   const existingDoc = await db.collection("HelpFiles").findOne(
+    { document_id: id }
+   );
+
     // Use document_id instead of _id for deletion
     const result = await db
       .collection("HelpFiles")
@@ -146,6 +164,15 @@ const deleteHelpFile = async (req, res) => {
    //} catch (err) {
    // console.error("Error deleting help file:", err);
     //res.status(500).json({ error: "Failed to delete help file" });
+    
+    // Log the change
+    await logChange({
+      action: "delete",
+      collection: "HelpFiles",
+      document_id: id,
+      oldData: existingDoc,
+      newData: null
+    });
 
     // Shows which help file was deleted
     res.status(200).json({

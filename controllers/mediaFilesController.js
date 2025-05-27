@@ -1,5 +1,6 @@
 const { getDB } = require("../db/mongoClient");
 const { ObjectId } = require("mongodb");
+const { logChange } = require("../utils/changelogLogger");
 
 
 
@@ -73,10 +74,15 @@ const updateMediaFile = async (req, res) => {
     const id = req.params.media_id;
     const updateData = req.body;
 
+
     // Not needed as media_id is used instead of _id
     //if (!ObjectId.isValid(id)) {
     //  return res.status(400).json({ error: "Invalid media id" });
     //}
+
+    const existingDoc = await db.collection("MediaFiles").findOne(
+      { media_id: id }
+    );
    
     const result = await db.collection("MediaFiles").updateOne(
       { media_id: id },
@@ -103,6 +109,16 @@ const updateMediaFile = async (req, res) => {
     // Shows the updated media file metadata in full
     // and what was updated
     const updatedDoc = await db.collection("MediaFiles").findOne({ media_id: id });
+
+    // Log the change
+    await logChange({
+      action: "update",
+      collection: "MediaFiles",
+      document_id: id,
+      oldData: existingDoc,
+      newData: updateData
+    });
+
     res.status(200).json({
       message: `Media file with media_id '${id}' updated successfully`,
       updatedFields: updateData,
@@ -128,6 +144,11 @@ const deleteMediaFile = async (req, res) => {
 
     // Use document_id instead of _id for deletion
     // if media_id is not found, return 404
+
+    const existingDoc = await db.collection("MediaFiles").findOne(
+      { media_id: id }
+    );
+
     const result = await db
       .collection("MediaFiles")
       .deleteOne({ media_id: id });
@@ -146,6 +167,15 @@ const deleteMediaFile = async (req, res) => {
     
     // This needs changed to show what media file was deleted
     //res.status(200).json({ message: "Deleted" });
+    
+    // Log the change
+    await logChange({
+      action: "delete",
+      collection: "MediaFiles",
+      document_id: id,
+      oldData: existingDoc,
+      newData: null
+    });
 
     // Shows which help file was deleted
     res.status(200).json({
