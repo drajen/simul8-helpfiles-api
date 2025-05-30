@@ -18,6 +18,9 @@ exports.exportHelpFileAsJSON = async (req, res) => {
 };
 
 // Export help file as Markdown
+
+const { convertToMarkdown } = require("../utils/jsonToMarkdown");
+
 exports.exportHelpFileAsMarkdown = async (req, res) => {
   try {
     const db = getDB();
@@ -25,12 +28,14 @@ exports.exportHelpFileAsMarkdown = async (req, res) => {
 
     if (!doc) return res.status(404).json({ message: "Help file not found" });
 
-    let mdOutput = `# ${doc.title || "Untitled"}\n\n`;
+    //let mdOutput = `# ${doc.title || "Untitled"}\n\n`; // moved to utils under utils as exportController.js 
 
-    doc.content_sections?.forEach((section) => {
-      mdOutput += `## ${section.section_title}\n\n`;
-      mdOutput += `${section.text}\n\n`;
-    });
+    //doc.content_sections?.forEach((section) => {
+    //  mdOutput += `## ${section.section_title}\n\n`;
+    //  mdOutput += `${section.text}\n\n`;
+    //});
+
+    const mdOutput = convertToMarkdown(doc); // delegates formatting to utils/jsonToMarkdown.js
 
     res.setHeader("Content-Disposition", `attachment; filename=${doc.document_id}.md`);
     res.setHeader("Content-Type", "text/markdown");

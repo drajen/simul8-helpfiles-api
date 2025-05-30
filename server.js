@@ -31,6 +31,9 @@ app.use("/api/files", uploadRoutes);
 const exportRoutes = require("./routes/exportRoutes");
 app.use("/api/export", exportRoutes);
 
+const convertRoutes = require("./routes/convertRoutes");
+app.use("/api/convert", convertRoutes);
+
 // DB and Server start
 connectToDatabase().then(() => {
   app.listen(process.env.PORT || 5050, () => {

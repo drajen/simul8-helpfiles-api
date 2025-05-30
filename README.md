@@ -17,30 +17,35 @@ This API is not yet public-facing and is intended for internal testing, research
 - Postman API for testing
 
 ## Features
-Phase 1 - Complete
+### Phase 1 – Complete
 - Full CRUD for Help Files ("/api/helpfiles")
 - Full CRUD for Media Files ("/api/mediafiles")
 - Structured API responses
 - Connection to MongoDB via Node.js driver
 - Modular file structure (controllers, routes, middleware)
 
-Phase 2 - Complete
+### Phase 2 – Complete
 - JWT-based authentication (Login, Logout, Protected Routes)
 - Basic role-based access control (Admin, Editor)
 - Input validation (express-validator)
 - Search Help Files and Media Files by tag
 
-Phase 3 - Complete
+### Phase 3 – Complete
 - Markdown-to-HTML parsing using markdown-it
 - /preview/:document_id endpoint for live HTML rendering
 - Preprocessing support for search/display
 
-## Next Steps (Phase 4 – In Progress)
-- Add export functionality (Markdown, JSON)
-- Build conversion middleware (JSON ↔ Markdown)
-- Implement Atlas Search integration and indexing
-- Create custom filter endpoints for search (e.g., by tag, category)
-- Introduce basic version control or audit logging for updates/deletes
+
+### Phase 4 – Complete
+- Export functionality (Markdown, JSON)
+- Conversion middleware (Markdown ↔ JSON)
+- Custom filter endpoints by tag and category
+- Basic version control/audit logging for update/delete actions
+
+### Final Phase – In Progress
+- Atlas Search integration and indexing
+- Error handling improvements
+- Mustache UI prototype for basic rendering (before React migration)
 
 ## Testing
 All endpoints have been tested via Postman.  

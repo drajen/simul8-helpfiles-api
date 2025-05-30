@@ -35,4 +35,13 @@ router.delete("/:document_id", deleteHelpFile);
 const { previewHelpFile } = require("../controllers/helpFilesController");
 router.get("/preview/:document_id", previewHelpFile);
 
+// Filter by category and tag for help files
+const { filterByCategory, filterByTag } = require("../controllers/filterController");
+
+router.get("/category/:category", filterByCategory);
+router.get("/tag/:tag", filterByTag);
+
+// Import markdown to json
+
+
 module.exports = router;
