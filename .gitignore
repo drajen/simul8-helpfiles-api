@@ -19,3 +19,21 @@ yarn-error.log*
 .vscode/
 .idea/
 *.swp
+
+# Mustache cache
+*.mustache.cache
+
+# Build / temp directories
+dist/
+tmp/
+temp/
+
+# MongoDB local dump
+dump/
+
+# Session/token files
+*.pem
+*.key
+
+# OS-specific
+Thumbs.db

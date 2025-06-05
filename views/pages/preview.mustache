@@ -1,0 +1,29 @@
+{{> header }}
+
+<div class="container-fluid p-4">
+  <a href="/dashboard" class="btn btn-link">&larr; Back to Dashboard</a>
+  <h1>{{title}}</h1>
+  <hr>
+
+  {{#parsed_sections}}
+    <h3>{{section_title}}</h3>
+    <div class="parsed-content">
+      {{{html}}}
+    </div>
+  {{/parsed_sections}}
+</div>
+
+<style>
+.parsed-content {
+  font-family: 'Segoe UI', sans-serif;
+  line-height: 1.6;
+}
+.parsed-content h3 {
+  margin-top: 1.5em;
+}
+.parsed-content img {
+  max-width: 100%;
+  height: auto;
+  margin: 1em 0;
+}
+</style>

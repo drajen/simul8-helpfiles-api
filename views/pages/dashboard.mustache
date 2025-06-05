@@ -1,0 +1,78 @@
+{{> header }}
+
+<div class="container-fluid p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Documents</h2>
+    <div>Logged in as {{user.name}} ({{user.role}})</div>
+  </div>
+
+  <!-- Search and Filters -->
+  <form method="GET" action="/dashboard" class="mb-4 d-flex align-items-center gap-3">
+    <input name="q" type="text" class="form-control mr-2" placeholder="Search for help files..." />
+    <button class="btn">Search</button>
+
+    <select name="category" class="form-control w-auto mr-2">
+      <option value="">All Categories</option>
+      <option value="features">Features</option>
+      <option value="example">Examples</option>
+      <option value="example">Tutorials</option>
+      <option value="example">Troubleshooting</option>
+      <option value="example">Getting Started</option>
+      <option value="example">Key Concepts</option>
+    </select>
+
+    <select name="tag" class="form-control w-auto mr-2">
+      <option value="">All Tags</option>
+      <option value="labels">Labels</option>
+      <option value="queue">Queue</option>
+      <option value="queue">Animation</option>
+      <option value="queue">Queue</option>
+      <option value="queue">Warm-up</option>
+      <option value="queue">Clock</option>
+    </select>
+
+    <select name="type" class="form-control w-auto">
+      <option value="">Type</option>
+      <option value="txt">Help Files</option>
+      <option value="s8">Simulation Files</option>
+      <option value="s8">Media Files</option>
+    </select>
+  </form>
+
+    {{#deleted}}
+    <div class="alert alert-success">
+        Help file deleted successfully.
+    </div>
+    {{/deleted}}
+
+  <!-- Help Files Table -->
+  <table class="table">
+    <thead>
+      <tr>
+        <th><input type="checkbox" /></th>
+        <th>Document ID</th>
+        <th>Category</th>
+        <th>Title</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#files}}
+      <tr>
+        <td><input type="checkbox" /></td>
+        <td>{{document_id}}</td>
+        <td>{{categories.0}}</td>
+        <td>{{title}}</td>
+        <td class="actions">
+          <a href="/helpfiles/{{document_id}}/edit">Edit</a>
+          <a href="/preview/{{document_id}}" class="btn btn-sm btn-outline-secondary">Preview</a>
+          <a href="/export/helpfile/md/{{document_id}}">Export</a>
+          <form method="POST" action="/helpfiles/{{document_id}}/delete" style="display:inline;">
+            <button class="btn btn-sm btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {{/files}}
+    </tbody>
+  </table>
+</div>

@@ -5,7 +5,8 @@ exports.verifyToken = (req, res, next) => {
   const token = req.cookies.jwt;
 
   if (!token) {
-    return res.status(403).json({ message: "No token provided" });
+    //return res.status(403).json({ message: "No token provided" });
+    return res.redirect("/auth/login");
   }
 
   try {
@@ -14,7 +15,8 @@ exports.verifyToken = (req, res, next) => {
     next();
   } catch (err) {
     console.error("Token verification failed:", err);
-    res.status(401).json({ message: "Unauthorized" });
+    //res.status(401).json({ message: "Unauthorized" });
+    res.redirect("/login");
   }
 };
 

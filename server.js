@@ -5,6 +5,8 @@ require("dotenv").config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const mustacheExpress = require("mustache-express");
+const path = require("path");
 
 const { connectToDatabase } = require("./db/mongoClient");
 
@@ -14,6 +16,16 @@ const app = express();
 app.use(cookieParser());
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
+// View engine setup for Mustache
+const mustachePath = path.join(__dirname, "views");
+
+app.use(express.static(path.join(__dirname, "public")));
+app.set("views", path.join(mustachePath, "pages")); 
+app.set("view engine", "mustache");
+app.engine("mustache", mustacheExpress(path.join(mustachePath, "layouts"), ".mustache"));
 
 // Routes
 const helpFilesRoutes = require("./routes/helpFilesRoutes");
@@ -23,7 +35,7 @@ const mediaFilesRoutes = require("./routes/mediaFilesRoutes");
 app.use("/api/mediafiles", mediaFilesRoutes);
 
 const authRoutes = require("./routes/authRoutes");
-app.use("/api/auth", authRoutes);
+app.use("/auth", authRoutes);
 
 const uploadRoutes = require("./routes/uploadRoutes");
 app.use("/api/files", uploadRoutes);
@@ -33,6 +45,9 @@ app.use("/api/export", exportRoutes);
 
 const convertRoutes = require("./routes/convertRoutes");
 app.use("/api/convert", convertRoutes);
+
+const uiRoutes = require("./routes/uiRoutes");
+app.use("/", uiRoutes);
 
 // DB and Server start
 connectToDatabase().then(() => {

@@ -1,0 +1,95 @@
+body {
+  display: flex;
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Helvetica', sans-serif;
+}
+
+.sidebar {
+  width: 220px;
+  background-color: #1e223e;
+  color: white;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.sidebar a {
+  color: white;
+  display: block;
+  padding: 0.5rem 0;
+  text-decoration: none;
+}
+
+.sidebar a:hover {
+  background-color: #2c3050;
+}
+
+.main-content {
+  flex-grow: 1;
+  background-color: white;
+  padding: 30px;
+}
+
+/* Improve table readability */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+}
+
+th, td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+thead {
+  background-color: #f0f2f5;
+}
+
+.actions a, .actions button {
+  margin-right: 6px;
+  font-size: 0.85rem;
+}
+
+input[type="text"], select {
+  padding: 6px 10px;
+  margin-right: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Button styles */
+button, .btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: #3e65cf;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover, .btn:hover {
+  background-color: #2c4dad;
+}
+
+form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+form label {
+  font-weight: 500;
+}
+
+form input,
+form textarea {
+  font-size: 0.95rem;
+}
+
+.container {
+  max-width: 720px;
+}

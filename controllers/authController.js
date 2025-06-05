@@ -27,14 +27,16 @@ exports.login = async (req, res) => {
     });
 
     res.cookie("jwt", token, { httpOnly: true, secure: false }); // set secure:true if HTTPS
-    res.status(200).json({ message: "Login successful", token });
+    //res.status(200).json({ message: "Login successful", token });
+    res.redirect("/dashboard");
   });
 };
 
 // Handle logout
 exports.logout = (req, res) => {
   res.clearCookie("jwt");
-  res.status(200).json({ message: "Logged out successfully" });
+  //res.status(200).json({ message: "Logged out successfully" });
+  res.redirect("/auth/login");
 };
 
 // Get current user
