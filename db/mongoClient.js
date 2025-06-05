@@ -1,7 +1,10 @@
-const { MongoClient } = require('mongodb');
-const uri = require("../atlas_uri");
+const { MongoClient } = require("mongodb");
 
-console.log(uri)
+let uri = process.env.MONGODB_URI;
+
+if (!uri) {
+  uri = require("../atlas_uri");
+}
 
 // Create a new MongoClient
 const client = new MongoClient(uri);
