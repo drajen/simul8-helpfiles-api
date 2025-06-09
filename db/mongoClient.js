@@ -7,9 +7,12 @@ if (!uri) {
 }
 
 // Create a new MongoClient
-const client = new MongoClient(uri);
-const dbname = "HelpFilesDB";
+const client = new MongoClient(uri, {
+ useNewUrlParser: true, // to allow modern connection logic
+  useUnifiedTopology: true, // to avoid legacy TLS issues
+});
 
+const dbname = "HelpFilesDB";
 let db;
 
 //  Define the connectToDatabase function
