@@ -13,6 +13,11 @@ const { verifyToken } = require("../middleware/authMiddleware");
  // });
 //});
 
+// Redirect root to login page
+router.get("/", (req, res) => {
+  res.redirect("/auth/login");
+});
+
 // Dashboard page route (with live data)
 router.get("/dashboard", verifyToken, async (req, res) => {
   try {
