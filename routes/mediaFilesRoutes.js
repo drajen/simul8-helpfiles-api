@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { verifyToken } = require("../middleware/authMiddleware");
 
 const {
   getAllMediaFiles,
@@ -7,7 +8,8 @@ const {
   createMediaFile,
   updateMediaFile,
   deleteMediaFile,
-  searchMediaFilesByTag
+  searchMediaFilesByTag,
+  previewMediaFile,
 } = require("../controllers/mediaFilesController");
 
 const { validateMediaFiles } = require("../middleware/mediaFilesValidator");
@@ -30,5 +32,8 @@ router.put("/media_id/:media_id", validateMediaFiles, validateRequest, updateMed
 
 // DELETE a media file by media_id
 router.delete("/media_id/:media_id", deleteMediaFile);
+
+// Preview a media file by media_id
+router.get("/mediafiles/:media_id/preview", verifyToken, previewMediaFile);
 
 module.exports = router;

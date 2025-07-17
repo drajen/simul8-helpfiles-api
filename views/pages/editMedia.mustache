@@ -1,0 +1,41 @@
+{{> header }}
+
+<div class="container mt-5">
+  <h2 class="mb-4">Edit Media File</h2>
+
+  <form method="POST" action="/mediafiles/{{media.media_id}}/edit">
+    <div class="form-group">
+      <label>Media ID</label>
+      <input type="text" class="form-control" value="{{media.media_id}}" readonly />
+    </div>
+
+    <div class="form-group">
+        <label>File Type</label>
+        <input type="text" class="form-control" name="file_type" value="{{media.type}}" />
+    </div>
+
+   <div class="form-group">
+        <label>Tags (comma-separated)</label>
+        <input type="text" class="form-control" name="tags" value="{{#media.tags}}{{.}},{{/media.tags}}" />
+   </div>
+
+    <div class="form-group">
+        <label>Media URL</label>
+        <input type="text" class="form-control" name="media_url" value="{{media.url}}" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Save Changes</button>
+    <a href="/dashboard?view=media" class="btn btn-secondary ml-2">Cancel</a>
+  </form>
+
+  {{#media.used_in_help_files.length}}
+    <div class="mt-4">
+    <h5>Used in Help Files</h5>
+    <ul>
+        {{#media.used_in_help_files}}
+        <li>{{document_id}}</li>
+        {{/media.used_in_help_files}}
+    </ul>
+    </div>
+  {{/media.used_in_help_files.length}}
+</div>

@@ -93,3 +93,8 @@ form textarea {
 .container {
   max-width: 720px;
 }
+
+.main-content {
+  margin-left: 220px; /* adjust if your sidebar is wider */
+  padding: 20px;
+}

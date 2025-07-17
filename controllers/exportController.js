@@ -1,14 +1,16 @@
 const { getDB } = require("../db/mongoClient");
+const { convertToMarkdown } = require("../utils/jsonToMarkdown"); // for markdown only
 
-// Export help file as JSON
-exports.exportHelpFileAsJSON = async (req, res) => {
+// Define JSON export
+const exportHelpFileAsJSON = async (req, res) => {
   try {
     const db = getDB();
-    const doc = await db.collection("HelpFiles").findOne({ document_id: req.params.document_id });
+    const document_id = decodeURIComponent(req.params.document_id);
+    const doc = await db.collection("HelpFiles").findOne({ document_id });
 
     if (!doc) return res.status(404).json({ message: "Help file not found" });
 
-    res.setHeader("Content-Disposition", `attachment; filename=${doc.document_id}.json`);
+    res.setHeader("Content-Disposition", `attachment; filename="${document_id}.json"`);
     res.setHeader("Content-Type", "application/json");
     res.status(200).send(JSON.stringify(doc, null, 2));
   } catch (err) {
@@ -17,31 +19,28 @@ exports.exportHelpFileAsJSON = async (req, res) => {
   }
 };
 
-// Export help file as Markdown
-
-const { convertToMarkdown } = require("../utils/jsonToMarkdown");
-
-exports.exportHelpFileAsMarkdown = async (req, res) => {
+// Define Markdown export
+const exportHelpFileAsMarkdown = async (req, res) => {
   try {
     const db = getDB();
-    const doc = await db.collection("HelpFiles").findOne({ document_id: req.params.document_id });
+    const document_id = decodeURIComponent(req.params.document_id);
+    const file = await db.collection("HelpFiles").findOne({ document_id });
 
-    if (!doc) return res.status(404).json({ message: "Help file not found" });
+    if (!file) return res.status(404).send("Help file not found");
 
-    //let mdOutput = `# ${doc.title || "Untitled"}\n\n`; // moved to utils under utils as exportController.js 
+    const markdown = convertToMarkdown(file);
 
-    //doc.content_sections?.forEach((section) => {
-    //  mdOutput += `## ${section.section_title}\n\n`;
-    //  mdOutput += `${section.text}\n\n`;
-    //});
-
-    const mdOutput = convertToMarkdown(doc); // delegates formatting to utils/jsonToMarkdown.js
-
-    res.setHeader("Content-Disposition", `attachment; filename=${doc.document_id}.md`);
+    res.setHeader("Content-Disposition", `attachment; filename="${document_id}.md"`);
     res.setHeader("Content-Type", "text/markdown");
-    res.status(200).send(mdOutput);
+    res.send(markdown);
   } catch (err) {
-    console.error("Export Markdown error:", err);
-    res.status(500).json({ error: "Failed to export help file" });
+    console.error("Markdown export error:", err);
+    res.status(500).send("Failed to export as Markdown");
   }
+};
+
+
+module.exports = {
+  exportHelpFileAsJSON,
+  exportHelpFileAsMarkdown
 };

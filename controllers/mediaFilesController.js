@@ -203,6 +203,29 @@ const searchMediaFilesByTag = async (req, res) => {
   }
 };
 
+// GET /mediafiles/:media_id/preview
+const previewMediaFile = async (req, res) => {
+  try {
+    const db = getDB();
+    const mediaId = req.params.media_id;
+
+    const file = await db.collection("MediaFiles").findOne({ media_id: mediaId });
+
+    if (!file) {
+      return res.status(404).send("Media file not found");
+    }
+
+    res.render("mediaPreview", {
+      layout: "header",
+      file,
+      user: req.user
+    });
+  } catch (err) {
+    console.error("Preview media error:", err);
+    res.status(500).send("Error previewing media");
+  }
+};
+
 // Export the controller functions
 module.exports = {
   getAllMediaFiles,
@@ -211,4 +234,5 @@ module.exports = {
   updateMediaFile,
   deleteMediaFile,
   searchMediaFilesByTag,
+  previewMediaFile
 };

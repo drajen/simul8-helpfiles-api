@@ -32,7 +32,7 @@ const helpFilesRoutes = require("./routes/helpFilesRoutes");
 app.use("/api/helpfiles", helpFilesRoutes);
 
 const mediaFilesRoutes = require("./routes/mediaFilesRoutes");
-app.use("/api/mediafiles", mediaFilesRoutes);
+app.use("/", mediaFilesRoutes);
 
 const authRoutes = require("./routes/authRoutes");
 app.use("/auth", authRoutes);
@@ -41,7 +41,7 @@ const uploadRoutes = require("./routes/uploadRoutes");
 app.use("/api/files", uploadRoutes);
 
 const exportRoutes = require("./routes/exportRoutes");
-app.use("/api/export", exportRoutes);
+app.use("/export", require("./routes/exportRoutes"));
 
 const convertRoutes = require("./routes/convertRoutes");
 app.use("/api/convert", convertRoutes);

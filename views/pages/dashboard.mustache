@@ -2,14 +2,30 @@
 
 <div class="container-fluid p-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Documents</h2>
+    <div class="d-flex align-items-center gap-3">
+      <h2>{{#isMediaView}}Media Files{{/isMediaView}}{{^isMediaView}}Help Files{{/isMediaView}}</h2>
+    </div>
     <div>Logged in as {{user.name}} ({{user.role}})</div>
   </div>
 
-  <!-- Search and Filters -->
+  <!-- View Switch Buttons -->
+  <div class="mb-3">
+    <a href="/dashboard?view=help" class="btn {{^isMediaView}}btn-primary{{/isMediaView}} {{#isMediaView}}btn-outline-secondary{{/isMediaView}}">Help Files</a>
+    <a href="/dashboard?view=media" class="btn {{#isMediaView}}btn-primary{{/isMediaView}} {{^isMediaView}}btn-outline-secondary{{/isMediaView}}">Media Files</a>
+  </div>
+
+  {{#deleted}}
+  <div class="alert alert-success">Selected help files deleted successfully.</div>
+  {{/deleted}}
+  {{#deleted}}
+  <div class="alert alert-success">Selected files deleted successfully.</div>
+  {{/deleted}}
+
+<!-- Search & Filters (Help Files Only) -->
+{{^isMediaView}}
   <form method="GET" action="/dashboard" class="mb-4 d-flex align-items-center gap-3">
     <input name="q" type="text" class="form-control mr-2" placeholder="Search for help files..." />
-    <button class="btn">Search</button>
+    <button class="btn btn-outline-primary">Search</button>
 
     <select name="category" class="form-control w-auto mr-2">
       <option value="">All Categories</option>
@@ -25,27 +41,20 @@
       <option value="">All Tags</option>
       <option value="labels">Labels</option>
       <option value="queue">Queue</option>
-      <option value="queue">Animation</option>
-      <option value="queue">Queue</option>
-      <option value="queue">Warm-up</option>
-      <option value="queue">Clock</option>
-    </select>
-
-    <select name="type" class="form-control w-auto">
-      <option value="">Type</option>
-      <option value="txt">Help Files</option>
-      <option value="s8">Simulation Files</option>
-      <option value="s8">Media Files</option>
+      <option value="animation">Animation</option>
+      <option value="warm-up">Warm-up</option>
+      <option value="clock">Clock</option>
     </select>
   </form>
 
-    {{#deleted}}
-    <div class="alert alert-success">
-        Help file deleted successfully.
-    </div>
-    {{/deleted}}
+  {{#deleted}}
+  <div class="alert alert-success">
+    Help file deleted successfully.
+  </div>
+  {{/deleted}}
 
   <!-- Help Files Table -->
+  <form method="POST" action="/bulk-delete" onsubmit="return confirm('Delete selected help files?');">
   <table class="table">
     <thead>
       <tr>
@@ -59,15 +68,23 @@
     <tbody>
       {{#files}}
       <tr>
-        <td><input type="checkbox" /></td>
+        <td><input type="checkbox" name="selected[]" value="{{document_id}}" /></td>
         <td>{{document_id}}</td>
         <td>{{categories.0}}</td>
         <td>{{title}}</td>
         <td class="actions">
-          <a href="/helpfiles/{{document_id}}/edit">Edit</a>
+          <a href="/helpfiles/{{document_id}}/edit" class="btn btn-sm btn-secondary">Edit</a>
           <a href="/preview/{{document_id}}" class="btn btn-sm btn-outline-secondary">Preview</a>
-          <a href="/export/helpfile/md/{{document_id}}">Export</a>
-          <form method="POST" action="/helpfiles/{{document_id}}/delete" style="display:inline;">
+          <div class="dropdown d-inline">
+            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown">
+              Export
+            </button>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="/export/helpfile/markdown/{{encoded_id}}">Markdown</a>
+              <a class="dropdown-item" href="/export/helpfile/json/{{encoded_id}}">JSON</a>
+            </div>
+          </div>
+          <form method="POST" action="/helpfiles/{{document_id}}/delete" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this help file?');">
             <button class="btn btn-sm btn-danger">Delete</button>
           </form>
         </td>
@@ -75,4 +92,59 @@
       {{/files}}
     </tbody>
   </table>
+    <button type="submit" class="btn btn-sm btn-danger mt-2">Delete Selected</button>
+</form>
+{{/isMediaView}}
+
+<!-- Media Files Table -->
+{{#isMediaView}}
+<!-- Search and Filters for Media -->
+<form method="GET" action="/dashboard" class="mb-4 d-flex align-items-center gap-3">
+  <input type="hidden" name="view" value="media" />
+  <input name="q" type="text" class="form-control mr-2" placeholder="Search media ID or tags..." value="{{q}}" />
+  <select name="file_type" class="form-control w-auto mr-2">
+    <option value="">All File Types</option>
+    <option value="image/png">PNG</option>
+    <option value="image/jpeg">JPEG</option>
+    <option value="image/gif">GIF</option>
+    <option value="video/mp4">MP4</option>
+    <option value="simulation/s8">s8</option>
+    <!-- Add more as needed -->
+  </select>
+  <button class="btn btn-primary">Search</button>
+</form>
+
+<form method="POST" action="/bulk-delete-media" onsubmit="return confirm('Delete selected media files?');">
+<table class="table">
+  <thead>
+    <tr>
+      <th><input type="checkbox" /></th>
+      <th>Media ID</th>
+      <th>File Type</th>
+      <th>Tags</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#mediaFiles}}
+    <tr>
+      <td><input type="checkbox" /></td>
+      <td>{{media_id}}</td>
+      <td>{{file_type}}</td>
+      <td>{{tags}}</td>
+      <td class="actions">
+        <a href="/mediafiles/{{media_id}}/preview" class="btn btn-sm btn-outline-secondary">Preview</a>
+        <a href="/mediafiles/{{media_id}}/edit" class="btn btn-sm btn-secondary">Edit</a>
+        <form method="POST" action="/mediafiles/{{media_id}}/delete" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this media file?');">
+          <button class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {{/mediaFiles}}
+  </tbody>
+</table>
+<button type="submit" class="btn btn-sm btn-danger mt-2">Delete Selected</button>
+</form>
+{{/isMediaView}}
+
 </div>

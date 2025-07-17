@@ -22,34 +22,72 @@ router.get("/", (req, res) => {
 router.get("/dashboard", verifyToken, async (req, res) => {
   try {
     const db = getDB();
-    const { category, tag, q, deleted } = req.query;
+    const { category, tag, q, file_type, deleted, view } = req.query;
+    const isMediaView = view === "media";
 
-    const query = {};
+    let files = [];
+    let mediaFiles = [];
 
-    if (category) {
-      query.categories = { $in: [category] }; // Exact match inside categories array
+    if (isMediaView) {
+      // MEDIA FILE QUERY
+      const mediaQuery = {};
+
+      if (file_type) {
+        mediaQuery.file_type = file_type;
+      }
+
+      if (tag) {
+        mediaQuery.tags = { $in: [tag] };
+      }
+
+      if (q) {
+        mediaQuery.$or = [
+          { media_id: { $regex: q, $options: "i" } },
+          { tags: { $in: [q] } },
+          { "used_in_help_files.document_id": { $regex: q, $options: "i" } }
+        ];
+      }
+
+      mediaFiles = await db.collection("MediaFiles")
+        .find(mediaQuery)
+        .project({ media_id: 1, file_type: 1, tags: 1, used_in_help_files: 1, media_url: 1 })
+        .limit(50)
+        .toArray();
+    } else {
+      // HELP FILE QUERY
+      const helpQuery = {};
+
+      if (category) {
+        helpQuery.categories = { $in: [category] };
+      }
+
+      if (tag) {
+        helpQuery.tags = { $in: [tag] };
+      }
+
+      if (q) {
+        helpQuery.title = { $regex: q, $options: "i" };
+      }
+
+      files = await db.collection("HelpFiles")
+        .find(helpQuery)
+        .project({ document_id: 1, title: 1, categories: 1 })
+        .limit(50)
+        .toArray();
+      
+        files.forEach(f => {
+        f.encoded_id = encodeURIComponent(f.document_id);
+      });
     }
-
-    if (tag) {
-      query.tags = { $in: [tag] }; // Match inside tags array (if used)
-    }
-
-    if (q) {
-      query.title = { $regex: q, $options: "i" }; // Case-insensitive search
-    }
-
-    const files = await db.collection("HelpFiles")
-      .find(query)
-      .project({ document_id: 1, title: 1, categories: 1 })
-      .limit(50)
-      .toArray();
 
     res.render("dashboard", {
       layout: "header",
-      title: "Document Management",
+      title: isMediaView ? "Media Files" : "Help Files",
       user: req.user,
+      deleted: deleted === "1",
+      isMediaView,
       files,
-      deleted: deleted === "1"
+      mediaFiles
     });
 
   } catch (err) {
@@ -142,6 +180,117 @@ router.post("/helpfiles/:document_id/delete", async (req, res) => {
   } catch (err) {
     console.error("Delete error:", err);
     res.status(500).send("Failed to delete help file");
+  }
+});
+
+// Changelog UI route
+router.get("/changelog", verifyToken, async (req, res) => {
+  try {
+    const db = getDB();
+    const logs = await db.collection("ChangeLogs").find().sort({ timestamp: -1 }).toArray();
+    res.render("changelog", { layout: "header", logs, user: req.user });
+  } catch (err) {
+    console.error("Changelog UI error:", err);
+    res.render("changelog", { layout: "header", logs: [], user: req.user });
+  }
+});
+
+// Edit media file UI route
+router.get("/mediafiles/:media_id/edit", verifyToken, async (req, res) => {
+  try {
+    const db = getDB();
+    const media = await db.collection("MediaFiles").findOne({ media_id: req.params.media_id });
+
+    if (!media) {
+      return res.status(404).send("Media file not found");
+    }
+
+    res.render("editMedia", {
+      layout: "header",
+      title: "Edit Media File",
+      user: req.user,
+      media
+    });
+  } catch (err) {
+    console.error("Media edit UI error:", err);
+    res.status(500).send("Server error");
+  }
+});
+
+
+// POST /mediafiles/:media_id/edit
+router.post("/mediafiles/:media_id/edit", verifyToken, async (req, res) => {
+  try {
+    const db = getDB();
+    const { file_type, tags, media_url } = req.body;
+
+    const updated = await db.collection("MediaFiles").updateOne(
+      { media_id: req.params.media_id },
+      {
+        $set: {
+          file_type,
+          media_url,
+          tags: tags.split(",").map(t => t.trim()) // Convert to array
+        }
+      }
+    );
+
+    if (updated.modifiedCount > 0) {
+      res.redirect("/dashboard?view=media&updated=1");
+    } else {
+      res.redirect("/dashboard?view=media&updated=0");
+    }
+  } catch (err) {
+    console.error("Media update error:", err);
+    res.status(500).send("Failed to update media file");
+  }
+});
+
+// Bulk delete route for help files
+router.post("/bulk-delete", verifyToken, async (req, res) => {
+  try {
+    const db = getDB();
+    const selected = req.body.selected;
+
+    if (!selected || selected.length === 0) {
+      return res.redirect("/dashboard?deleted=0");
+    }
+
+    const ids = Array.isArray(selected) ? selected : [selected];
+
+    const result = await db.collection("HelpFiles").deleteMany({
+      document_id: { $in: ids }
+    });
+
+    console.log(`Deleted ${result.deletedCount} help files`);
+    res.redirect("/dashboard?deleted=1");
+  } catch (err) {
+    console.error("Bulk delete error:", err);
+    res.status(500).send("Failed to bulk delete");
+  }
+});
+
+
+router.post("/bulk-delete-media", verifyToken, async (req, res) => {
+  try {
+    const db = getDB();
+    const selected = req.body.selected;
+
+    if (!selected || selected.length === 0) {
+      return res.redirect("/dashboard?view=media&deleted=0");
+    }
+
+    const ids = Array.isArray(selected) ? selected : [selected];
+
+    const result = await db.collection("MediaFiles").deleteMany({
+      media_id: { $in: ids }
+    });
+
+    console.log(`Deleted ${result.deletedCount} media files`);
+    res.redirect("/dashboard?view=media&deleted=1");
+  } catch (err) {
+    console.error("Bulk delete (media) error:", err);
+    res.status(500).send("Failed to bulk delete media files");
   }
 });
 

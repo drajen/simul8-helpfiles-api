@@ -45,13 +45,15 @@ This API is not yet public-facing and is intended for internal testing, research
 ### Final Phase – In Progress
 - Atlas Search integration and indexing
 - Error handling improvements
-- Mustache UI prototype for basic rendering (before React migration)
 
 ## Testing
 All endpoints have been tested via Postman.  
 Test collections are saved in a shared **Postman Workspace**.
 
-
+## Comments
+- Basic .txt file upload > JSON > MongoDB is implemented. Parsing is currently minimal and will be refined post-demo.
+- Upload endpoint (/api/files/upload-txt) available via Postman — UI integration planned in future work.
+- Bulk operations for editing and export is planned in final refinement.
 
 ## Private Repository
 This repository contains internal development code for academic and team review.  

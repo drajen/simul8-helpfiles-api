@@ -53,6 +53,15 @@ const createHelpFile = async (req, res) => {
     //  message: "Help file created successfully",
     //  insertedId: result.insertedId,
     //});
+    
+    // Changelog for create help file
+    await logChange({
+      action: "create",
+      collection: "HelpFiles",
+      document_id: newFile.document_id,
+      user: req.user?.username || "system",
+      newData: newFile
+    });
    
     // Shows which help file was created
     res.status(201).json({
