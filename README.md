@@ -1,4 +1,4 @@
-# Help Files Project - API
+# Honours Project - Simul8 Help Files Manager
 
 
 This is a private Node.js and Express.js API for managing **Help Files** and **Media Files** stored in **MongoDB Atlas**.
@@ -9,14 +9,15 @@ All endpoints have been tested using Postman, and test collections are available
 
 This API is not yet public-facing and is intended for internal testing, research and use only.
 
-
 ## Tech Stack
 - Node.js
 - Express.js
+- Mustache
 - MongoDB Atlas
-- Postman API for testing
+- Postman (API testing)
 
 ## Features
+
 ### Phase 1 – Complete
 - Full CRUD for Help Files ("/api/helpfiles")
 - Full CRUD for Media Files ("/api/mediafiles")
@@ -42,16 +43,21 @@ This API is not yet public-facing and is intended for internal testing, research
 - Custom filter endpoints by tag and category
 - Basic version control/audit logging for update/delete actions
 
-### Final Phase – In Progress
-- Atlas Search integration and indexing
+### Final Phase – Complete
+- Combined search
+- Changelog improvements
+- Txt file upload
+- Bulk export help files to Markdown or JSON
 - Error handling improvements
+- Enhanced security features - token expiry, block user login (max 5 attempts)
+- Report bug and suggest features modal in footer
 
 ## Testing
-All endpoints have been tested via Postman.  
-Test collections are saved in a shared **Postman Workspace**.
+- All endpoints have been tested via Postman.  
+- Test collections are saved in a shared **Postman Workspace** (link available on request).
 
 ## Comments
-- Basic .txt file upload > JSON > MongoDB is implemented. Parsing is currently minimal and will be refined post-demo.
+- Basic .txt file upload > JSON > MongoDB is implemented. Parsing is currently minimal and will be refined in further work. 
 - Upload endpoint (/api/files/upload-txt) available via Postman — UI integration planned in future work.
 - Bulk operations for editing and export is planned in final refinement.
 

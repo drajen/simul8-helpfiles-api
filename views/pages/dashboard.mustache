@@ -1,150 +1,421 @@
 {{> header }}
 
-<div class="container-fluid p-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div class="d-flex align-items-center gap-3">
-      <h2>{{#isMediaView}}Media Files{{/isMediaView}}{{^isMediaView}}Help Files{{/isMediaView}}</h2>
-    </div>
-    <div>Logged in as {{user.name}} ({{user.role}})</div>
-  </div>
-
-  <!-- View Switch Buttons -->
-  <div class="mb-3">
-    <a href="/dashboard?view=help" class="btn {{^isMediaView}}btn-primary{{/isMediaView}} {{#isMediaView}}btn-outline-secondary{{/isMediaView}}">Help Files</a>
-    <a href="/dashboard?view=media" class="btn {{#isMediaView}}btn-primary{{/isMediaView}} {{^isMediaView}}btn-outline-secondary{{/isMediaView}}">Media Files</a>
-  </div>
-
-  {{#deleted}}
-  <div class="alert alert-success">Selected help files deleted successfully.</div>
-  {{/deleted}}
-  {{#deleted}}
-  <div class="alert alert-success">Selected files deleted successfully.</div>
-  {{/deleted}}
-
-<!-- Search & Filters (Help Files Only) -->
-{{^isMediaView}}
-  <form method="GET" action="/dashboard" class="mb-4 d-flex align-items-center gap-3">
-    <input name="q" type="text" class="form-control mr-2" placeholder="Search for help files..." />
-    <button class="btn btn-outline-primary">Search</button>
-
-    <select name="category" class="form-control w-auto mr-2">
-      <option value="">All Categories</option>
-      <option value="features">Features</option>
-      <option value="example">Examples</option>
-      <option value="example">Tutorials</option>
-      <option value="example">Troubleshooting</option>
-      <option value="example">Getting Started</option>
-      <option value="example">Key Concepts</option>
-    </select>
-
-    <select name="tag" class="form-control w-auto mr-2">
-      <option value="">All Tags</option>
-      <option value="labels">Labels</option>
-      <option value="queue">Queue</option>
-      <option value="animation">Animation</option>
-      <option value="warm-up">Warm-up</option>
-      <option value="clock">Clock</option>
-    </select>
-  </form>
-
-  {{#deleted}}
-  <div class="alert alert-success">
-    Help file deleted successfully.
-  </div>
-  {{/deleted}}
-
-  <!-- Help Files Table -->
-  <form method="POST" action="/bulk-delete" onsubmit="return confirm('Delete selected help files?');">
-  <table class="table">
-    <thead>
-      <tr>
-        <th><input type="checkbox" /></th>
-        <th>Document ID</th>
-        <th>Category</th>
-        <th>Title</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#files}}
-      <tr>
-        <td><input type="checkbox" name="selected[]" value="{{document_id}}" /></td>
-        <td>{{document_id}}</td>
-        <td>{{categories.0}}</td>
-        <td>{{title}}</td>
-        <td class="actions">
-          <a href="/helpfiles/{{document_id}}/edit" class="btn btn-sm btn-secondary">Edit</a>
-          <a href="/preview/{{document_id}}" class="btn btn-sm btn-outline-secondary">Preview</a>
-          <div class="dropdown d-inline">
-            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown">
-              Export
-            </button>
-            <div class="dropdown-menu">
-              <a class="dropdown-item" href="/export/helpfile/markdown/{{encoded_id}}">Markdown</a>
-              <a class="dropdown-item" href="/export/helpfile/json/{{encoded_id}}">JSON</a>
-            </div>
+<div class="container-fluid px-4 pt-3">
+  <div class="row justify-content-center">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="d-flex align-items-center gap-3">
+            <h2>{{#isMediaView}}Media Files{{/isMediaView}}{{^isMediaView}}Help Files{{/isMediaView}}</h2>
           </div>
-          <form method="POST" action="/helpfiles/{{document_id}}/delete" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this help file?');">
-            <button class="btn btn-sm btn-danger">Delete</button>
-          </form>
-        </td>
-      </tr>
-      {{/files}}
-    </tbody>
-  </table>
-    <button type="submit" class="btn btn-sm btn-danger mt-2">Delete Selected</button>
-</form>
-{{/isMediaView}}
+          <div>Logged in as {{user.name}} ({{user.role}})</div>
+        </div>
 
-<!-- Media Files Table -->
-{{#isMediaView}}
-<!-- Search and Filters for Media -->
-<form method="GET" action="/dashboard" class="mb-4 d-flex align-items-center gap-3">
-  <input type="hidden" name="view" value="media" />
-  <input name="q" type="text" class="form-control mr-2" placeholder="Search media ID or tags..." value="{{q}}" />
-  <select name="file_type" class="form-control w-auto mr-2">
-    <option value="">All File Types</option>
-    <option value="image/png">PNG</option>
-    <option value="image/jpeg">JPEG</option>
-    <option value="image/gif">GIF</option>
-    <option value="video/mp4">MP4</option>
-    <option value="simulation/s8">s8</option>
-    <!-- Add more as needed -->
-  </select>
-  <button class="btn btn-primary">Search</button>
-</form>
+        <!-- View Switch Buttons -->
+        <div class="mb-3">
+          <a href="/dashboard?view=help" class="btn {{^isMediaView}}btn-primary{{/isMediaView}} {{#isMediaView}}btn-outline-secondary{{/isMediaView}}">Help Files</a>
+          <a href="/dashboard?view=media" class="btn {{#isMediaView}}btn-primary{{/isMediaView}} {{^isMediaView}}btn-outline-secondary{{/isMediaView}}">Media Files</a>
+        </div>
 
-<form method="POST" action="/bulk-delete-media" onsubmit="return confirm('Delete selected media files?');">
-<table class="table">
-  <thead>
-    <tr>
-      <th><input type="checkbox" /></th>
-      <th>Media ID</th>
-      <th>File Type</th>
-      <th>Tags</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#mediaFiles}}
-    <tr>
-      <td><input type="checkbox" /></td>
-      <td>{{media_id}}</td>
-      <td>{{file_type}}</td>
-      <td>{{tags}}</td>
-      <td class="actions">
-        <a href="/mediafiles/{{media_id}}/preview" class="btn btn-sm btn-outline-secondary">Preview</a>
-        <a href="/mediafiles/{{media_id}}/edit" class="btn btn-sm btn-secondary">Edit</a>
-        <form method="POST" action="/mediafiles/{{media_id}}/delete" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this media file?');">
-          <button class="btn btn-sm btn-danger">Delete</button>
-        </form>
-      </td>
-    </tr>
-    {{/mediaFiles}}
-  </tbody>
-</table>
-<button type="submit" class="btn btn-sm btn-danger mt-2">Delete Selected</button>
-</form>
-{{/isMediaView}}
+      <!-- Search & Filters (Help Files Only) -->
+      {{^isMediaView}}
 
+      <!-- Search and Filters Form -->
+      <form method="GET" action="/dashboard" class="mb-4 d-flex align-items-center gap-3">
+        <input type="text" name="q" class="form-control mr-2" placeholder="Search for help files..." value="{{q}}" />
+        <button class="btn btn-outline-primary">Search</button>
+       
+
+        <select name="category" class="form-control w-auto mr-2 ml-2" onchange="this.form.submit()">
+          <option value="">All Categories</option>
+          {{#categoryOptions}}
+            <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+          {{/categoryOptions}}
+        </select>
+
+        <select name="tag" class="form-control w-auto mr-2" onchange="this.form.submit()">
+          <option value="">All Tags</option>
+          {{#tagOptions}}
+            <option value="{{value}}" {{#selected}}selected{{/selected}}>{{value}}</option>
+          {{/tagOptions}}
+        </select>
+
+        <a href="/dashboard"
+          class="btn ml-2 mr-2 {{#filtersActive}}btn-outline-danger{{/filtersActive}}{{^filtersActive}}btn-outline-success{{/filtersActive}}"
+          title="Reset all filters">
+          {{#filtersActive}}
+            <i class="fa-solid fa-filter-circle-xmark text-danger"></i>
+          {{/filtersActive}}
+          {{^filtersActive}}
+            <i class="fa-solid fa-filter text-success"></i>
+          {{/filtersActive}}
+        </a>
+
+      </form>
+
+      <!-- Per-page Limit Form -->
+      <form method="GET" action="/dashboard" class="form-inline mb-3">
+        <input type="hidden" name="view" value="help" />
+        <label class="mr-2">Show:</label>
+        <select name="limit" class="form-control w-auto mr-2" onchange="this.form.submit()">
+          <option value="10" {{#isLimit10}}selected{{/isLimit10}}>10</option>
+          <option value="25" {{#isLimit25}}selected{{/isLimit25}}>25</option>
+        </select>
+        <span>per page</span>
+      </form>
+
+      <!-- Success Alert -->
+      {{#deleted}}
+      <div class="alert alert-success">
+        Help file deleted successfully.
+      </div>
+      {{/deleted}}
+
+      {{#submitted_bug}}
+      <div class="alert alert-success text-center">Thank you for reporting a bug!</div>
+      {{/submitted_bug}}
+    
+      {{#submitted_feature}}
+          <div class="alert alert-success text-center">Thank you for your feature suggestion!</div>
+      {{/submitted_feature}}
+
+      <!-- Bulk Delete Form -->
+      <form method="POST" action="/bulk-delete" onsubmit="return confirm('Delete selected help files?');">
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="select-all" /></th>
+              <th>Document ID</th>
+              <th>Category</th>
+              <th>Title</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#files}}
+            <tr>
+              <td><input type="checkbox" name="selected[]" value="{{document_id}}" /></td>
+              <td>{{document_id}}</td>
+              <td>{{categories.0}}</td>
+              <td>{{title}}</td>
+              <td class="actions text-nowrap">
+                <a href="/preview/{{document_id}}" class="btn btn-sm btn-outline-info mr-1" title="Preview">
+                  <i class="fas fa-eye"></i>
+                </a>
+                <a href="/helpfiles/{{document_id}}/edit" class="btn btn-sm btn-outline-secondary mr-1" title="Edit">
+                  <i class="fas fa-pen"></i>
+                </a>
+              
+                <!--<div class="btn-group">
+                  <button class="btn btn-sm btn-outline-primary dropdown-toggle" data-toggle="dropdown" title="Export">
+                    <i class="fas fa-download"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/export/helpfile/markdown/{{encoded_id}}">Markdown</a>
+                    <a class="dropdown-item" href="/export/helpfile/json/{{encoded_id}}">JSON</a>
+                  </div>
+                </div>-->
+                <button class="btn btn-sm btn-danger ml-1" title="Delete"
+                        formaction="/helpfiles/{{document_id}}/delete"
+                        formmethod="POST"
+                        onclick="return confirm('Are you sure you want to delete this help file?');">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+            {{/files}}
+          </tbody>
+        </table>
+        <p class="mb-2 text-muted">Selected: <span id="selected-count">0</span></p>
+        <div id="bulk-actions" style="display: none;">
+          <button type="submit" class="btn btn-sm btn-danger mt-2 mb-2">Delete Selected</button>
+          <button id="export-selected-btn" type="button" class="btn btn-sm btn-outline-success ml-2">
+            Export Selected
+          </button>
+        </div>
+      </form>
+
+      <!-- Pagination -->
+      {{#totalPages}}
+      <nav aria-label="Pagination">
+        <ul class="pagination">
+          {{#pageLinks}}
+          <li class="page-item {{#active}}active{{/active}}">
+            <a class="page-link" href="?view=help&page={{number}}&limit={{limit}}">{{number}}</a>
+          </li>
+          {{/pageLinks}}
+        </ul>
+      </nav>
+      {{/totalPages}}
+
+      {{/isMediaView}}
+
+      <!-- Media Files Table -->
+     {{#isMediaView}}
+
+      <!-- Search and Filters Form -->
+      <form method="GET" action="/dashboard" class="mb-4 d-flex align-items-center gap-3">
+        <input type="hidden" name="view" value="media" />
+        <input name="q" type="text" class="form-control mr-2" placeholder="Search media files..." value="{{q}}" />
+        <button class="btn btn-outline-primary">Search</button>
+
+        <select name="category" class="form-control w-auto mr-2 ml-2" onchange="this.form.submit()">
+          <option value="">All Categories</option>
+          {{#categoryOptions}}
+            <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+          {{/categoryOptions}}
+        </select>
+
+        <select name="tag" class="form-control w-auto mr-2" onchange="this.form.submit()">
+          <option value="">All Tags</option>
+          {{#tagOptions}}
+            <option value="{{value}}" {{#selected}}selected{{/selected}}>{{value}}</option>
+          {{/tagOptions}}
+        </select>
+
+        <select name="file_type" class="form-control w-auto mr-2" onchange="this.form.submit()">
+          <option value="">All File Types</option>
+          {{#fileTypeOptions}}
+            <option value="{{value}}" {{#selected}}selected{{/selected}}>{{value}}</option>
+          {{/fileTypeOptions}}
+        </select>
+
+        <a href="/dashboard"
+          class="btn ml-2 mr-2 {{#filtersActive}}btn-outline-danger{{/filtersActive}}{{^filtersActive}}btn-outline-success{{/filtersActive}}"
+          title="Reset all filters">
+          {{#filtersActive}}
+            <i class="fa-solid fa-filter-circle-xmark text-danger"></i>
+          {{/filtersActive}}
+          {{^filtersActive}}
+            <i class="fa-solid fa-filter text-success"></i>
+          {{/filtersActive}}
+        </a>
+        
+      </form>
+
+      <!-- Per-page Limit Dropdown -->
+      <form method="GET" action="/dashboard" class="form-inline mb-3">
+        <input type="hidden" name="view" value="media" />
+        <label class="mr-2">Show:</label>
+        <select name="limit" class="form-control w-auto mr-2" onchange="this.form.submit()">
+          <option value="10" {{#isLimit10}}selected{{/isLimit10}}>10</option>
+          <option value="25" {{#isLimit25}}selected{{/isLimit25}}>25</option>
+        </select>
+        <span>per page</span>
+      </form>
+
+      <!-- Bulk Delete Form -->
+      <form method="POST" action="/bulk-delete-media" onsubmit="return confirm('Delete selected media files?');">
+        <table class="table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="select-all" /></th>
+              <th>Media ID</th>
+              <th>File Type</th>
+              <th>Tags</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#mediaFiles}}
+            <tr>
+              <td><input type="checkbox" name="selected[]" value="{{media_id}}" /></td>
+              <td>{{media_id}}</td>
+              <td>{{file_type}}</td>
+              <td>{{tags}}</td>
+              <td class="actions text-nowrap">
+                <a href="/mediafiles/{{media_id}}/preview" class="btn btn-sm btn-outline-secondary" title="Preview">
+                  <i class="fas fa-eye"></i>
+                </a>
+                <a href="/mediafiles/{{media_id}}/edit" class="btn btn-sm btn-secondary" title="Edit">
+                  <i class="fas fa-pen"></i>
+                </a>
+                <button class="btn btn-sm btn-danger" title="Delete" formaction="/mediafiles/{{media_id}}/delete" formmethod="POST" onclick="return confirm('Are you sure you want to delete this media file?');">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+            {{/mediaFiles}}
+          </tbody>
+        </table>
+        <p class="mb-2 text-muted">Selected: <span id="selected-count">0</span></p>
+        <div id="bulk-actions-media" style="display: none;">
+          <button type="submit" class="btn btn-sm btn-danger mt-2 mb-2">Delete Selected</button>
+        </div>
+      </form>
+
+      <!-- Pagination -->
+      {{#totalPages}}
+        <nav aria-label="Pagination">
+          <ul class="pagination">
+            {{#pageLinks}}
+              <li class="page-item {{#active}}active{{/active}}">
+                <a class="page-link" href="?view=media&page={{number}}&limit={{limit}}">{{number}}</a>
+              </li>
+            {{/pageLinks}}
+          </ul>
+        </nav>
+      {{/totalPages}}
+
+      {{/isMediaView}}
+
+    </div>
+  </div>
 </div>
+
+<!-- Bulk Export Modal -->
+<div class="modal fade" id="exportConfirmModal" tabindex="-1" role="dialog" aria-labelledby="exportConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exportConfirmModalLabel">Export Selected Files</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Choose export format:
+        <div class="mt-3">
+          <button id="export-md" class="btn btn-sm btn-outline-primary mr-2">Markdown</button>
+          <button id="export-json" class="btn btn-sm btn-outline-secondary">JSON</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Update the selected count
+  function updateSelectedCount() {
+    const count = document.querySelectorAll('input[name="selected[]"]:checked').length;
+    const countDisplay = document.getElementById("selected-count");
+    if (countDisplay) {
+      countDisplay.textContent = count;
+    }
+  }
+
+  // Limit bulk selection to 10
+  document.querySelectorAll("form[action^='/bulk-delete']").forEach(form => {
+    form.addEventListener("submit", function (e) {
+      const selectedCount = this.querySelectorAll('input[name="selected[]"]:checked').length;
+      if (selectedCount > 10) {
+        alert("You can only delete up to 10 items at a time.");
+        e.preventDefault();
+      }
+    });
+  });
+
+  // Select All Checkbox
+  document.getElementById("select-all")?.addEventListener("change", function (e) {
+    const checked = e.target.checked;
+    document.querySelectorAll('input[name="selected[]"]').forEach(cb => {
+      cb.checked = checked;
+      cb.closest("tr").classList.toggle("table-active", checked);
+    });
+    updateSelectedCount(); // Update on select all toggle
+  });
+
+  // Individual Row Checkbox
+  document.querySelectorAll('input[name="selected[]"]').forEach(cb => {
+    cb.addEventListener("change", function () {
+      this.closest("tr").classList.toggle("table-active", this.checked);
+      updateSelectedCount(); // Update on individual toggle
+    });
+  });
+
+  // On page load
+  updateSelectedCount(); // Initial count
+</script>
+
+<script>
+    function updateSelectedCount() {
+    const checkboxes = document.querySelectorAll('input[name="selected[]"]:checked');
+    const count = checkboxes.length;
+    const countDisplay = document.getElementById("selected-count");
+    const bulkActions = document.getElementById("bulk-actions");
+    const bulkActionsMedia = document.getElementById("bulk-actions-media");
+
+    if (countDisplay) countDisplay.textContent = count;
+
+    if (bulkActions) {
+      bulkActions.style.display = count > 0 ? "block" : "none";
+    }
+
+    if (bulkActionsMedia) {
+      bulkActionsMedia.style.display = count > 0 ? "block" : "none";
+    }
+  }
+
+  // Export Selected Handler (error prone solution)
+  /*document.getElementById("export-selected-btn")?.addEventListener("click", function (e) {
+    const selected = [...document.querySelectorAll('input[name="selected[]"]:checked')];
+    if (selected.length === 0) return;
+
+    if (selected.length > 10) {
+      alert("You can only export up to 10 items at a time.");
+      return;
+    }
+
+    const confirmed = confirm(`Export ${selected.length} selected items?`);
+    if (!confirmed) return;
+
+    const ids = selected.map(cb => cb.value);
+    const format = prompt("Export format? Type `md` for Markdown or `json`").toLowerCase();
+
+    if (format !== "md" && format !== "json") {
+      alert("Invalid format. Only `md` or `json` allowed.");
+      return;
+    }
+
+    ids.forEach(id => {
+      const url = `/export/helpfile/${format}/${encodeURIComponent(id)}`;
+      window.open(url, "_blank");
+    });
+
+    alert("Export initiated in new tabs.");
+  });*/
+
+  // Update on change
+  document.querySelectorAll('input[name="selected[]"]').forEach(cb => {
+    cb.addEventListener("change", updateSelectedCountAndButtons);
+  });
+
+  document.getElementById("select-all")?.addEventListener("change", updateSelectedCountAndButtons);
+
+  updateSelectedCountAndButtons(); // Initial state
+</script>
+
+<script>
+  document.getElementById("export-selected-btn")?.addEventListener("click", () => {
+    $('#exportConfirmModal').modal('show');
+  });
+
+  const getSelectedIds = () => {
+    const selected = Array.from(document.querySelectorAll('input[name="selected[]"]:checked'));
+    if (selected.length > 10) {
+      alert("You can only export up to 10 files at a time.");
+      return [];
+    }
+    return selected.map(cb => cb.value);
+  };
+
+  const triggerExport = (format) => {
+    const ids = getSelectedIds();
+    if (!ids.length) return;
+
+    ids.forEach(id => {
+      const link = document.createElement("a");
+      link.href = `/export/helpfile/${format}/${encodeURIComponent(id)}`;
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+
+    $('#exportConfirmModal').modal('hide');
+    alert("Export started in new tabs!");
+  };
+
+  document.getElementById("export-md")?.addEventListener("click", () => triggerExport("markdown"));
+  document.getElementById("export-json")?.addEventListener("click", () => triggerExport("json"));
+</script>

@@ -1,7 +1,7 @@
 const { getDB } = require("../db/mongoClient");
 const { ObjectId } = require("mongodb");
-const { logChange } = require("./changeLogController");
-
+const { logChange } = require("../controllers/changeLogController");
+const { getDifferences } = require("../utils/changelogLogger");
 
 // Get all help files
 const getAllHelpFiles = async (req, res) => {
@@ -78,7 +78,7 @@ const createHelpFile = async (req, res) => {
 
 
 // PUT update help file by document_id
-const updateHelpFile = async (req, res) => {
+/*const updateHelpFile = async (req, res) => {
   try {
     const db = getDB();
     const id = req.params.document_id;
@@ -141,6 +141,130 @@ const updateHelpFile = async (req, res) => {
     console.error("Error updating help file:", err);
     res.status(500).json({ error: "Failed to update help file" });
   }
+};*/
+
+
+// PUT update help file by document_id
+const updateHelpFile = async (req, res) => {
+  try {
+    const db = getDB();
+    const id = req.params.document_id;
+    const submitted = req.body;
+
+    const existingDoc = await db.collection("HelpFiles").findOne({ document_id: id });
+    if (!existingDoc) {
+      return res.status(404).json({ message: "Help file not found" });
+    }
+
+    const updatedDoc = { ...existingDoc };
+
+    // Parse comma-separated tags/categories if sent as string
+    if (typeof submitted.categories === "string") {
+      updatedDoc.categories = submitted.categories.split(",").map(c => c.trim());
+    } else if (Array.isArray(submitted.categories)) {
+      updatedDoc.categories = submitted.categories;
+    }
+
+    if (typeof submitted.tags === "string") {
+      updatedDoc.tags = submitted.tags.split(",").map(t => t.trim());
+    } else if (Array.isArray(submitted.tags)) {
+      updatedDoc.tags = submitted.tags;
+    }
+
+    // Update title if submitted
+    if (submitted.title && typeof submitted.title === "string") {
+      updatedDoc.title = submitted.title.trim();
+    }
+
+    // Update references by type
+    if (Array.isArray(submitted.references)) {
+      try {
+        const parsedRefs = typeof submitted.references === "string"
+          ? JSON.parse(submitted.references)
+          : submitted.references;
+
+        updatedDoc.references = existingDoc.references.map(ref => {
+          if (ref.type === "see_also") {
+            const newSeeAlso = parsedRefs.find(r => r.type === "see_also");
+            return newSeeAlso || ref;
+
+          } else if ((ref.type === "legacy_url" || ref.type === "software_link") && req.user?.role === "admin") {
+            const newRef = parsedRefs.find(r => r.type === ref.type);
+            return newRef || ref;
+          }
+
+          return ref;
+        });
+      } catch (err) {
+        console.error("Failed to parse references JSON:", err);
+        return res.status(400).json({ error: "Invalid references format" });
+      }
+    }
+
+    updatedDoc.updated_at = new Date();
+
+    const result = await db.collection("HelpFiles").updateOne(
+      { document_id: id },
+      { $set: updatedDoc }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(200).json({
+        message: `Help file with document_id '${id}' found, but no changes were made`,
+        note: "Please check the submitted data.",
+      });
+    }
+
+    await logChange({
+      action: "update",
+      collection: "HelpFiles",
+      document_id: id,
+      user: req.user && req.user.username ? { name: req.user.username } : { name: "system" },
+      oldData: existingDoc,
+      newData: updatedDoc,
+    });
+
+    /*res.status(200).json({
+      message: `Help file with document_id '${id}' updated successfully`,
+      updatedFields: submitted,
+      updatedDocument: updatedDoc,
+    });*/
+    const changelogs = await db.collection("ChangeLogs")
+      .find({ document_id: id })
+      .sort({ timestamp: -1 })
+      .limit(5)
+      .toArray();
+
+    changelogs.forEach(log => {
+      log.timestamp = new Date(log.timestamp).toLocaleString("en-GB", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      });
+
+      if (log.oldData && log.newData) {
+        log.differences = getDifferences(log.oldData, log.newData);
+      } else {
+        log.differences = [];
+      }
+    });
+
+    return res.render("edit", {
+      title: updatedDoc.title,
+      document_id: updatedDoc.document_id,
+      titleValue: updatedDoc.title,
+      categories: updatedDoc.categories.join(", "),
+      tags: updatedDoc.tags.join(", "),
+      references: JSON.stringify(updatedDoc.references || [], null, 2),
+      content_sections: updatedDoc.content_sections || [],
+      changelogs,
+      isAdmin: req.user?.role === "admin",
+      success: `✔ Help file '${id}' updated successfully`
+    });
+
+  } catch (err) {
+    console.error("Error updating help file:", err);
+    res.status(500).json({ error: "Failed to update help file" });
+  }
 };
 
 
@@ -179,6 +303,7 @@ const deleteHelpFile = async (req, res) => {
       action: "delete",
       collection: "HelpFiles",
       document_id: id,
+      user: req.user && req.user.username ? { name: req.user.username } : { name: "system" },
       oldData: existingDoc,
       newData: null
     });

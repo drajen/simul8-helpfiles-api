@@ -1,6 +1,7 @@
 const { getDB } = require("../db/mongoClient");
 const { ObjectId } = require("mongodb");
 const { logChange } = require("../utils/changelogLogger");
+const { getDifferences } = require("../utils/changelogLogger");
 
 
 
@@ -115,14 +116,40 @@ const updateMediaFile = async (req, res) => {
       action: "update",
       collection: "MediaFiles",
       document_id: id,
+      user: req.user && req.user.username ? { name: req.user.username } : { name: "system" },
       oldData: existingDoc,
       newData: updateData
     });
 
-    res.status(200).json({
+    const changelogs = await db.collection("ChangeLogs")
+      .find({ document_id: id })
+      .sort({ timestamp: -1 })
+      .limit(5)
+      .toArray();
+
+    changelogs.forEach(log => {
+      log.timestamp = new Date(log.timestamp).toLocaleString("en-GB", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      });
+
+      if (log.oldData && log.newData) {
+        log.differences = getDifferences(log.oldData, log.newData);
+      } else {
+        log.differences = [];
+      }
+    });
+
+    /*res.status(200).json({
       message: `Media file with media_id '${id}' updated successfully`,
       updatedFields: updateData,
       updatedDocument: updatedDoc
+    });*/
+    return res.render("editmedia", {
+      media: updatedDoc,
+      isAdmin: req.user?.role === "admin",
+      changelogs,
+      success: `✔ Media file '${id}' updated successfully`
     });
   } catch (err) {
     console.error("Error updating media file:", err);
@@ -173,6 +200,7 @@ const deleteMediaFile = async (req, res) => {
       action: "delete",
       collection: "MediaFiles",
       document_id: id,
+      user: req.user && req.user.username ? { name: req.user.username } : { name: "system" },
       oldData: existingDoc,
       newData: null
     });

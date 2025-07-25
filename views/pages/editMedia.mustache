@@ -1,9 +1,23 @@
 {{> header }}
 
-<div class="container mt-5">
+<div class="container-fluid p-4">
+
+  <div class="mt-4 mb-2">
+    <a href="/dashboard?view=media" class="btn btn-secondary"> ← Back to Media Files</a>
+  </div>
+
   <h2 class="mb-4">Edit Media File</h2>
 
-  <form method="POST" action="/mediafiles/{{media.media_id}}/edit">
+  <form id="editForm" method="POST" action="/mediafiles/{{media.media_id}}/edit">
+
+    {{#success}}
+      <div class="alert alert-success">{{success}}</div>
+    {{/success}}
+
+    {{#error}}
+      <div class="alert alert-danger">{{error}}</div>
+    {{/error}}
+
     <div class="form-group">
       <label>Media ID</label>
       <input type="text" class="form-control" value="{{media.media_id}}" readonly />
@@ -38,4 +52,38 @@
     </ul>
     </div>
   {{/media.used_in_help_files.length}}
+
+  {{#changelogs.length}}
+      <hr />
+      <h5>Recent Changes</h5>
+      <ul class="list-group mb-3">
+        {{#changelogs}}
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <strong class="text-capitalize text-primary">{{action}}</strong>
+                on <code class="text-danger">{{document_id}}</code>
+                by <span class="text-success">{{user.name}}</span>
+              </div>
+              <small class="text-muted">{{timestamp}}</small>
+            </div>
+
+            {{#differences.length}}
+              <ul class="mb-0">
+                {{#differences}}
+                  <li>{{.}}</li>
+                {{/differences}}
+              </ul>
+            {{/differences.length}}
+          </li>
+        {{/changelogs}}
+      </ul>
+    {{/changelogs.length}}
 </div>
+
+<script>
+  document.getElementById("editForm").addEventListener("submit", function(e) {
+    const confirmEdit = confirm("Are you sure you want to update this media file?");
+    if (!confirmEdit) e.preventDefault();
+  });
+</script>

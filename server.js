@@ -24,6 +24,9 @@ const mustachePath = path.join(__dirname, "views");
 
 app.use(express.static(path.join(__dirname, "public")));
 app.set("views", path.join(mustachePath, "pages")); 
+app.locals.stringify = function(obj) {
+  return JSON.stringify(obj, null, 2);
+};
 app.set("view engine", "mustache");
 app.engine("mustache", mustacheExpress(path.join(mustachePath, "layouts"), ".mustache"));
 
@@ -32,7 +35,7 @@ const helpFilesRoutes = require("./routes/helpFilesRoutes");
 app.use("/api/helpfiles", helpFilesRoutes);
 
 const mediaFilesRoutes = require("./routes/mediaFilesRoutes");
-app.use("/", mediaFilesRoutes);
+app.use("/api/media", mediaFilesRoutes);
 
 const authRoutes = require("./routes/authRoutes");
 app.use("/auth", authRoutes);
@@ -45,6 +48,10 @@ app.use("/export", require("./routes/exportRoutes"));
 
 const convertRoutes = require("./routes/convertRoutes");
 app.use("/api/convert", convertRoutes);
+
+app.get("/upload", (req, res) => {
+  res.render("upload", { success: req.query.success, error: req.query.error });
+});
 
 const uiRoutes = require("./routes/uiRoutes");
 app.use("/", uiRoutes);

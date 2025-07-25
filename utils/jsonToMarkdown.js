@@ -13,8 +13,13 @@ function convertToMarkdown(helpFile) {
 
   helpFile.content_sections?.forEach((section) => {
     // Skip "Main" as it's just a backend marker
-    if (section.section_title?.toLowerCase() !== "main") {
+  /* if (section.section_title?.toLowerCase() !== "main") {
       md += `## ${section.section_title || "No title"}\n\n`;
+    } */
+   
+   const title = section.section_title?.trim();
+    if (title && title.toLowerCase() !== "main") {
+      md += `## ${title}\n\n`;
     }
 
     // Convert internal links before adding the text

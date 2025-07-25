@@ -18,6 +18,12 @@ const helpFilesValidationRules = [
     .optional()
     .isArray().withMessage('content_sections must be an array'),
 
+  body('content_sections.*.section_title')
+  .optional().isString().withMessage('Each section_title must be a string'),
+
+  body('content_sections.*.text')
+  .optional().isString().withMessage('Each section text must be a string'),
+
   body('tags')
     .optional()
     .isArray().withMessage('tags must be an array'),

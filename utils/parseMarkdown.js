@@ -1,14 +1,14 @@
-// utils/parseMarkdown.js
-const MarkdownIt = require('markdown-it');
+const MarkdownIt = require("markdown-it");
 const md = new MarkdownIt();
 
-// Converts Markdown string to HTML
-// @param {string} markdownText
-// @returns {string} HTML string
-function parseMarkdownToHtml(markdownText) {
-  return md.render(markdownText);
+function parseMarkdownToHtml(markdown) {
+  if (typeof markdown !== "string") {
+    console.warn("Skipping non-string markdown:", markdown);
+    return "";
+  }
+  return md.render(markdown);
 }
 
 module.exports = {
-  parseMarkdownToHtml,
+  parseMarkdownToHtml
 };

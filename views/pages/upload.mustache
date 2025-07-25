@@ -1,0 +1,47 @@
+{{> header }}
+
+<div class="container mt-5">
+  <h2 class="mb-4">Upload Help File (TXT)</h2>
+
+   <div class="alert alert-warning d-flex align-items-center" role="alert">
+    <i class="fas fa-flask mr-2"></i>
+    <strong>Beta Feature: </strong> This upload tool is in testing. Output may not be 100% accurate.
+   </div>
+  
+    {{#success}}
+    <div class="alert alert-success" role="alert">
+      {{success}} <a href="/dashboard" class="ml-3 btn btn-sm btn-outline-primary">Back to Dashboard</a>
+    </div>
+    {{/success}}
+
+    {{#error}}
+    <div class="alert alert-danger" role="alert">
+      {{error}} <a href="/dashboard" class="ml-3 btn btn-sm btn-outline-secondary">Back to Dashboard</a>
+    </div>
+    {{/error}}
+
+  <form action="/api/files/upload-txt" method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="doc_type">Select Help File Category</label>
+      <select name="doc_type" id="doc_type" class="form-control" required>
+        <option value="gettingstarted">Getting Started</option>
+        <option value="model_building_basics">Simulation Key Concepts</option>
+        <option value="gettingaround">Getting Around</option>
+        <option value="features">Feature Reference Guide</option>
+        <option value="tips">How Do I?</option>
+        <option value="troubleshoot">Troubleshooting</option>
+        <option value="simul8-online">Simul8 Online</option>
+        <option value="examples">Examples</option>
+        <option value="tutorials">Tutorials</option>
+      </select>
+    </div>
+
+    <div class="form-group mt-3">
+      <label for="file">Upload .txt File</label>
+      <input type="file" class="form-control-file" name="file" id="file" accept=".txt" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Upload</button>
+    <a href="/dashboard" class="btn btn-secondary mt-3 ml-2">Cancel</a>
+  </form>
+</div>

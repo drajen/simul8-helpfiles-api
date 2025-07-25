@@ -1,3 +1,4 @@
+/* === BASE === */
 body {
   display: flex;
   min-height: 100vh;
@@ -5,40 +6,105 @@ body {
   font-family: 'Helvetica', sans-serif;
 }
 
+/* === SIDEBAR === */
 .sidebar {
-  width: 220px;
-  background-color: #1e223e;
+  width: 70px;
+  background-color: #1e2240;
   color: white;
-  padding: 20px;
+  padding: 20px 10px;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+  white-space: nowrap;
 }
 
-.sidebar h2 {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
+.sidebar:hover {
+  width: 180px;
 }
 
 .sidebar a {
+  display: flex;
+  align-items: center;
   color: white;
-  display: block;
-  padding: 0.5rem 0;
   text-decoration: none;
+  padding: 10px;
+  transition: color 0.2s ease;
 }
 
 .sidebar a:hover {
   background-color: #2c3050;
 }
 
+.sidebar a i {
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+.sidebar a span {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar:hover a span {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* === LOGO BEHAVIOUR === */
+.logo-container {
+  position: relative;
+  height: 60px;
+  margin-bottom: 1rem;
+}
+
+.logo-container img {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease;
+  max-height: 50px;
+}
+
+.logo-small {
+  opacity: 1;
+}
+
+.logo-full {
+  opacity: 0;
+  max-height: 60px;
+}
+
+.sidebar:hover .logo-small {
+  opacity: 0;
+}
+
+.sidebar:hover .logo-full {
+  opacity: 1;
+  transform: translateX(-50%) scale(1.5);
+  max-height: 80px;
+}
+
+/* === MAIN CONTENT === */
 .main-content {
   flex-grow: 1;
   background-color: white;
   padding: 30px;
+  margin-left: 70px;
 }
 
-/* Improve table readability */
+.sidebar:hover ~ .main-content {
+  margin-left: 180px;
+}
+
+/* === TABLE === */
 table {
   width: 100%;
   border-collapse: collapse;
   background-color: #fff;
+}
+
+thead {
+  background-color: #f0f2f5;
 }
 
 th, td {
@@ -47,34 +113,19 @@ th, td {
   border-bottom: 1px solid #ddd;
 }
 
-thead {
-  background-color: #f0f2f5;
-}
-
-.actions a, .actions button {
+/* === ACTION BUTTONS === */
+.actions a,
+.actions button {
   margin-right: 6px;
   font-size: 0.85rem;
 }
 
+/* === FORM ELEMENTS === */
 input[type="text"], select {
   padding: 6px 10px;
   margin-right: 10px;
   border-radius: 4px;
   border: 1px solid #ccc;
-}
-
-/* Button styles */
-button, .btn {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  background-color: #3e65cf;
-  color: #fff;
-  cursor: pointer;
-}
-
-button:hover, .btn:hover {
-  background-color: #2c4dad;
 }
 
 form .form-group {
@@ -90,11 +141,55 @@ form textarea {
   font-size: 0.95rem;
 }
 
-.container {
-  max-width: 720px;
+/* === BUTTONS === */
+button, .btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: #3e65cf;
+  color: #fff;
+  cursor: pointer;
 }
 
-.main-content {
-  margin-left: 220px; /* adjust if your sidebar is wider */
-  padding: 20px;
+button:hover, .btn:hover {
+  background-color: #2c4dad;
+}
+
+/* === PREVIEW PARSED CONTENT === */
+.parsed-content {
+  font-family: 'Segoe UI', sans-serif;
+  line-height: 1.6;
+}
+
+.parsed-content h3 {
+  margin-top: 1.5em;
+}
+
+.parsed-content img {
+  max-width: 100%;
+  height: auto;
+  margin: 1em 0;
+}
+
+/* === PRINT MODE === */
+@media print {
+  .sidebar,
+  .btn,
+  .dropdown,
+  nav,
+  footer {
+    display: none !important;
+  }
+
+  body {
+    padding: 2rem;
+    background: white;
+    color: black;
+  }
+}
+
+.login-bg {
+  min-height: 10vh;
+  margin-top: -600px;
+  background-color: #1e2240;
 }

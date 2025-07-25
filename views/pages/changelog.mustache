@@ -1,9 +1,8 @@
 {{> header }}
 
 <div class="main-content mt-5">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-md-8">
+  <div class="container justify-content-center">
+      <div class="col-md-10">
         <div class="card shadow-sm">
           <div class="card-body">
             <h2 class="mb-4 text-center">Change Log</h2>
@@ -11,12 +10,27 @@
             {{#logs.length}}
               <ul class="list-group">
                 {{#logs}}
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                      <strong class="text-capitalize text-primary">{{action}}</strong>
-                      on <span class="text-monospace text-danger">{{document_id}}</span>
+                  <li class="list-group-item mb-4 shadow-sm border rounded">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <div>
+                        <strong class="text-capitalize text-primary">{{action}}</strong>
+                        on <code class="text-danger">{{document_id}}</code>
+                        by <span class="text-success">{{user.name}}</span>
+                      </div>
+                      <small class="text-muted">{{timestamp}}</small>
                     </div>
-                    <small class="text-muted">{{timestamp}}</small>
+
+                    {{#differences.length}}
+                      <ul class="list-unstyled ps-3 mb-0">
+                        {{#differences}}
+                          <li class="mb-1">
+                            <i class="fas fa-circle fa-2xs text-success"></i>
+                            <span class="ms-2">{{{ . }}}</span>
+                          </li>
+                        {{/differences}}
+                      </ul>
+                    {{/differences.length}}
+
                   </li>
                 {{/logs}}
               </ul>
@@ -25,9 +39,10 @@
             {{^logs.length}}
               <div class="alert alert-info text-center">No changes logged yet.</div>
             {{/logs.length}}
+
+            <hr />
           </div>
         </div>
       </div>
-    </div>
   </div>
 </div>

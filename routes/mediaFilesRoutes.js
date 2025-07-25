@@ -34,6 +34,6 @@ router.put("/media_id/:media_id", validateMediaFiles, validateRequest, updateMed
 router.delete("/media_id/:media_id", deleteMediaFile);
 
 // Preview a media file by media_id
-router.get("/mediafiles/:media_id/preview", verifyToken, previewMediaFile);
+router.get("/api/media/mediafiles/:media_id/preview", verifyToken, previewMediaFile);
 
 module.exports = router;

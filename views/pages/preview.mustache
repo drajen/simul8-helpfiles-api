@@ -1,7 +1,11 @@
 {{> header }}
 
-<div class="container-fluid p-4">
-  <a href="/dashboard" class="btn btn-link">&larr; Back to Dashboard</a>
+<div class="container mt-5">
+
+  <div class="mt-4 mb-2">
+    <a href="/dashboard?view=help" class="btn btn-secondary"> ← Back to Help Files</a>
+  </div>
+
   <hr>
   <h1>{{title}}</h1>
   <hr>
@@ -12,19 +16,20 @@
       {{{html}}}
     </div>
   {{/parsed_sections}}
-</div>
 
-<style>
-.parsed-content {
-  font-family: 'Segoe UI', sans-serif;
-  line-height: 1.6;
-}
-.parsed-content h3 {
-  margin-top: 1.5em;
-}
-.parsed-content img {
-  max-width: 100%;
-  height: auto;
-  margin: 1em 0;
-}
-</style>
+  {{#seeAlsoLinks.length}}
+    <hr>
+    <h4>See Also</h4>
+    <ul>
+      {{#seeAlsoLinks}}
+        <li><a href="/preview/{{document_id}}">{{link_text}}</a></li>
+      {{/seeAlsoLinks}}
+    </ul>
+  {{/seeAlsoLinks.length}}
+
+  <div class="mt-4 mb-5">
+    <a href="/export/helpfile/markdown/{{document_id}}" class="btn btn-outline-primary">Export as Markdown</a>
+    <a href="/export/helpfile/json/{{document_id}}" class="btn btn-outline-dark">Export as JSON</a>
+    <button class="btn btn-outline-secondary" onclick="window.print()">🖨️ Print</button>
+  </div>
+</div>

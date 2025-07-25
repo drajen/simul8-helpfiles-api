@@ -16,9 +16,19 @@
     {{/file.used_in_help_files.length}}
 
     {{#file.media_url}}
+    {{#file.isImage}}
       <div class="text-center mt-4">
         <img src="{{file.media_url}}" class="img-fluid" alt="Preview" style="max-height: 400px;" />
       </div>
+    {{/file.isImage}}
+
+    {{#file.isSimulation}}
+        <div class="text-center mt-4">
+          <a href="{{file.media_url}}" class="btn btn-primary" download>
+            <i class="fas fa-download"></i> {{file.media_id}}
+          </a>
+        </div>
+      {{/file.isSimulation}}
     {{/file.media_url}}
 
     {{^file.media_url}}
@@ -27,6 +37,7 @@
   </div>
 
   <div class="mt-4">
-    <a href="/dashboard?view=media" class="btn btn-secondary">← Back to Media Files</a>
+    <a href="/dashboard?view=media" class="btn btn-secondary"> ← Back to Media Files</a>
   </div>
+  
 </div>

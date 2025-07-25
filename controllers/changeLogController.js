@@ -1,19 +1,22 @@
 const { getDB } = require("../db/mongoClient");
 
-// Log a change
 async function logChange({ action, collection, document_id, user = "system", oldData, newData }) {
-  const db = getDB();
-  await db.collection("ChangeLogs").insertOne({
-    action,               // e.g. "update", "delete"
-    collection,           // e.g. "HelpFiles"
-    document_id,
-    user,
-    timestamp: new Date(),
-    oldData: oldData || null,
-    newData: newData || null
-  });
+  try {
+    const db = getDB();
+    const logEntry = {
+      action,
+      collection,
+      document_id,
+      user: typeof user === "string" ? { name: user } : (user?.name ? { name: user.name } : { name: "system" }),
+      timestamp: new Date(),
+      oldData: oldData || null,
+      newData: newData || null,
+    };
+    await db.collection("ChangeLogs").insertOne(logEntry);
+    console.log("Change logged:", logEntry);
+  } catch (err) {
+    console.error("Failed to log change:", err);
+  }
 }
 
-module.exports = {
-  logChange
-};
+module.exports = { logChange };
