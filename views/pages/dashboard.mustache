@@ -10,11 +10,34 @@
           <div>Logged in as {{user.name}} ({{user.role}})</div>
         </div>
 
+
         <!-- View Switch Buttons -->
         <div class="mb-3">
           <a href="/dashboard?view=help" class="btn {{^isMediaView}}btn-primary{{/isMediaView}} {{#isMediaView}}btn-outline-secondary{{/isMediaView}}">Help Files</a>
           <a href="/dashboard?view=media" class="btn {{#isMediaView}}btn-primary{{/isMediaView}} {{^isMediaView}}btn-outline-secondary{{/isMediaView}}">Media Files</a>
         </div>
+
+        <!-- Success Alert (works for both views!) -->
+        {{#deleted}}
+          {{#isMediaView}}
+            <div class="alert alert-success">
+              Media file(s) deleted successfully.
+            </div>
+          {{/isMediaView}}
+          {{^isMediaView}}
+            <div class="alert alert-success">
+              Help file(s) deleted successfully.
+            </div>
+          {{/isMediaView}}
+        {{/deleted}}
+
+        {{#submitted_bug}}
+          <div class="alert alert-success text-center">Thank you for reporting a bug!</div>
+        {{/submitted_bug}}
+        
+        {{#submitted_feature}}
+          <div class="alert alert-success text-center">Thank you for your feature suggestion!</div>
+        {{/submitted_feature}}
 
       <!-- Search & Filters (Help Files Only) -->
       {{^isMediaView}}
@@ -63,21 +86,6 @@
         <span>per page</span>
       </form>
 
-      <!-- Success Alert -->
-      {{#deleted}}
-      <div class="alert alert-success">
-        Help file deleted successfully.
-      </div>
-      {{/deleted}}
-
-      {{#submitted_bug}}
-      <div class="alert alert-success text-center">Thank you for reporting a bug!</div>
-      {{/submitted_bug}}
-    
-      {{#submitted_feature}}
-          <div class="alert alert-success text-center">Thank you for your feature suggestion!</div>
-      {{/submitted_feature}}
-
       <!-- Bulk Delete Form -->
       <form method="POST" action="/bulk-delete" onsubmit="return confirm('Delete selected help files?');">
 
@@ -115,12 +123,12 @@
                     <a class="dropdown-item" href="/export/helpfile/json/{{encoded_id}}">JSON</a>
                   </div>
                 </div>-->
-                <button class="btn btn-sm btn-danger ml-1" title="Delete"
+                <!--<button class="btn btn-sm btn-danger ml-1" title="Delete"
                         formaction="/helpfiles/{{document_id}}/delete"
                         formmethod="POST"
-                        onclick="return confirm('Are you sure you want to delete this help file?');">
+                        onsubmit="return confirm('Are you sure you want to delete this help file?');">
                   <i class="fas fa-trash"></i>
-                </button>
+                </button>-->
               </td>
             </tr>
             {{/files}}
@@ -180,7 +188,7 @@
           {{/fileTypeOptions}}
         </select>
 
-        <a href="/dashboard"
+        <a href="/dashboard{{#isMediaView}}?view=media{{/isMediaView}}"
           class="btn ml-2 mr-2 {{#filtersActive}}btn-outline-danger{{/filtersActive}}{{^filtersActive}}btn-outline-success{{/filtersActive}}"
           title="Reset all filters">
           {{#filtersActive}}
@@ -190,7 +198,7 @@
             <i class="fa-solid fa-filter text-success"></i>
           {{/filtersActive}}
         </a>
-        
+
       </form>
 
       <!-- Per-page Limit Dropdown -->
@@ -230,9 +238,9 @@
                 <a href="/mediafiles/{{media_id}}/edit" class="btn btn-sm btn-secondary" title="Edit">
                   <i class="fas fa-pen"></i>
                 </a>
-                <button class="btn btn-sm btn-danger" title="Delete" formaction="/mediafiles/{{media_id}}/delete" formmethod="POST" onclick="return confirm('Are you sure you want to delete this media file?');">
+                <!--<button class="btn btn-sm btn-danger" title="Delete" formaction="/mediafiles/{{media_id}}/delete" formmethod="POST" onsubmit="return confirm('Are you sure you want to delete this media file?');">
                   <i class="fas fa-trash"></i>
-                </button>
+                </button>-->
               </td>
             </tr>
             {{/mediaFiles}}

@@ -59,6 +59,8 @@ const { getDB } = require("../db/mongoClient");
 };*/
 
 exports.uploadTxtFile = async (req, res) => {
+  //debugger;
+  console.log("UPLOAD ROUTE HIT", req.file, req.body);
   try {
     const filePath = req.file.path;
 
@@ -70,37 +72,97 @@ exports.uploadTxtFile = async (req, res) => {
 
     const rawText = fs.readFileSync(filePath, "utf-8").trim();
 
-    // 2. Get selected doc_type from form (used for category + document_id prefix)
+    /* 2. Get selected doc_type from form (used for category + document_id prefix)
     const docType = req.body.doc_type?.trim();
     if (!docType) {
       fs.unlinkSync(filePath);
       return res.status(400).json({ error: "Document type not provided" });
+    } */
+    // 3. Parse DokuWiki-style headings
+    const titleMatch = rawText.match(/^={4,}\s*(.*?)\s*={4,}/m);
+    const cleanTitle = titleMatch ? titleMatch[1].trim() : "Untitled";
+
+    // Split into sections based on "==== Section Title ===="
+    const sectionRegex = /={4,}\s*(.*?)\s*={4,}\n/g;
+    let match;
+    let lastIndex = 0;
+    let contentSections = [];
+    let firstSectionDone = false;
+
+    // Find all section headings and their positions
+    while ((match = sectionRegex.exec(rawText)) !== null) {
+      if (!firstSectionDone) {
+        firstSectionDone = true;
+        // Skip the main title line
+        lastIndex = sectionRegex.lastIndex;
+        continue;
+      }
+      // The section title
+      const sectionTitle = match[1].trim();
+      // Find where the next section starts
+      const nextSection = sectionRegex.exec(rawText);
+      // Reset lastIndex for next iteration
+      sectionRegex.lastIndex = match.index + match[0].length;
+
+      // Get the section text
+      let sectionText;
+      if (nextSection) {
+        sectionText = rawText.substring(match.index + match[0].length, nextSection.index).trim();
+        // Put back the pointer for the next loop
+        sectionRegex.lastIndex = nextSection.index;
+      } else {
+        sectionText = rawText.substring(match.index + match[0].length).trim();
+      }
+
+      contentSections.push({
+        section_title: sectionTitle,
+        text: sectionText
+      });
+      // If there was a nextSection, put sectionRegex back to its last found position
+      if (nextSection) {
+        sectionRegex.lastIndex = nextSection.index;
+      }
     }
 
-    // 3. Parse sections
-    const lines = rawText.split("\n\n").filter(Boolean);
-    const titleLine = lines[0] || "Untitled";
-    const cleanTitle = titleLine.replace(/=+/g, "").trim(); // strip markdown = for title
+    // If no sections found, treat everything after the main title as one section
+    if (contentSections.length === 0 && cleanTitle !== "Untitled") {
+      const afterTitle = rawText.split(titleMatch[0])[1]?.trim() || "";
+      contentSections = [{
+        section_title: cleanTitle,
+        text: afterTitle
+      }];
+    }
 
-    const contentSections = lines.slice(1).map((para, idx) => ({
-      section_title: `Section ${idx + 1}`,
-      text: para.trim()
-    }));
+    // 4. Get doc_id input from form (new field)
+    let docIdInput = req.body.doc_id?.trim() || ""; // added to upload form
+    let document_id = docIdInput;
+    const urlMatch = docIdInput.match(/id=([^&]+)/);
+    let legacy_url = "";
 
-    // 4. Build document_id slug 
-    const slug = cleanTitle
-      .toLowerCase()
-      .replace(/\s+/g, "_")
-      .replace(/[^a-z0-9_]/g, "");
+    if (urlMatch) {
+      document_id = urlMatch[1];
+      legacy_url = docIdInput; // full URL pasted
+    } else {
+      legacy_url = ""; // or set to null if only doc ID is given
+    }
+
+    // If user didn’t provide, fallback to slug logic
+    if (!document_id) {
+      const slug = cleanTitle
+        .toLowerCase()
+        .replace(/\s+/g, "_")
+        .replace(/[^a-z0-9_]/g, "");
+      document_id = `${docType}:${slug}`;
+    }
 
     const helpFile = {
-      document_id: `${docType}:${slug}`,
-      title: cleanTitle,
-      tags: ["upload"],
-      categories: [docType],
-      content_sections: contentSections,
-      created_at: new Date()
-    };
+    document_id,
+    legacy_url, // store the pasted DokuWiki URL (or "" if just doc ID)
+    title: cleanTitle,
+    tags: ["upload"],
+    content_sections: contentSections,
+    created_at: new Date()
+  };
 
     const db = getDB();
     const result = await db.collection("HelpFiles").insertOne(helpFile);

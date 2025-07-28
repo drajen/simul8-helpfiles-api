@@ -143,9 +143,9 @@ router.get("/dashboard", verifyToken, async (req, res) => {
     { label: "Examples", slug: "examples" },
     { label: "Tutorials", slug: "tutorials" },
     { label: "Troubleshooting", slug: "troubleshooting" },
-    { label: "Getting Started", slug: "getting_started" },
-    { label: "Key Concepts", slug: "key_concepts" },
-    { label: "Simul8 Online", slug: "simul8-online" }  // slug matches document_id
+    { label: "Getting Started", slug: "getting started" },
+    { label: "Key Concepts", slug: "key concepts" },
+    { label: "Simul8 Online", slug: "simul8 online" }  // slug matches document_id
     ];
 
     const categoryOptions = rawCategories.map(cat => ({
@@ -158,7 +158,14 @@ router.get("/dashboard", verifyToken, async (req, res) => {
       "labels",
       "queue",
       "clock",
-      "warm-up"
+      "warm-up",
+      "simulation",
+      "tips",
+      "troubleshooting",
+      "examples",
+      "data",
+      "ui",
+      "reference"
     ].map(tagValue => ({
       value: tagValue,
       selected: tagValue === tag
@@ -180,13 +187,16 @@ router.get("/dashboard", verifyToken, async (req, res) => {
       "image/png",
       "image/jpeg",
       "image/gif",
-      "simulation/s8"
+      "simulation/s8",
+      "document/pdf",
+      "document/docx",
+      "document/xlsx"
     ].map(type => ({
       value: type,
       selected: type === file_type
     }));
 
-    const filtersActive = !!(req.query.q || req.query.category || req.query.tag);
+    const filtersActive = !!(req.query.q || req.query.category || req.query.tag || req.query.file_type);
     
     // Debugging logs
     console.log("Category used:", category);
@@ -471,9 +481,20 @@ router.post("/helpfiles/:document_id/edit", verifyToken, async (req, res, next) 
 
 
 // DELETE /helpfiles/:document_id/delete
-router.post("/helpfiles/:document_id/delete", async (req, res) => {
+/*router.post("/helpfiles/:document_id/delete", async (req, res) => {
   try {
     const db = getDB();
+    const oldData = await db.collection("HelpFiles").findOne({ document_id: req.params.document_id });
+    if (oldData) {
+      await logChange({
+        action: "delete",
+        collection: "HelpFiles",
+        document_id: req.params.document_id,
+        user: req.user && req.user.username ? { name: req.user.username } : { name: "system" },
+        oldData,
+        newData: null
+      });
+    }
     await db.collection("HelpFiles").deleteOne({ document_id: req.params.document_id });
 
     res.redirect("/dashboard?deleted=1");
@@ -481,7 +502,31 @@ router.post("/helpfiles/:document_id/delete", async (req, res) => {
     console.error("Delete error:", err);
     res.status(500).send("Failed to delete help file");
   }
-});
+});*/
+
+
+// DELETE /mediafiles/:media_id/delete
+/*router.post("/mediafiles/:media_id/delete", async (req, res) => {
+  try {
+    const db = getDB();
+    const oldData = await db.collection("MediaFiles").findOne({ media_id: req.params.media_id });
+    if (oldData) {
+      await logChange({
+        action: "delete",
+        collection: "MediaFiles",
+        document_id: req.params.media_id,
+        user: req.user && req.user.username ? { name: req.user.username } : { name: "system" },
+        oldData,
+        newData: null
+      });
+    }
+    await db.collection("MediaFiles").deleteOne({ media_id: req.params.media_id });
+    res.redirect("/dashboard?view=media&deleted=1");
+  } catch (err) {
+    console.error("Delete media error:", err);
+    res.status(500).send("Failed to delete media file");
+  }
+});*/
 
 // Changelog UI route
 router.get("/changelog", verifyToken, async (req, res) => {
@@ -496,7 +541,8 @@ router.get("/changelog", verifyToken, async (req, res) => {
         dateStyle: "medium",
         timeStyle: "short",
       });
-
+      
+      log.isDelete = (log.action && log.action.toLowerCase() === "delete");
       if (log.oldData && log.newData) {
         log.differences = getDifferences(log.oldData, log.newData);
       } else {
@@ -695,6 +741,7 @@ router.post("/bulk-delete", verifyToken, async (req, res) => {
 
 // Bulk delete route for media files
 router.post("/bulk-delete-media", verifyToken, async (req, res) => {
+  console.log('---- BULK DELETE MEDIA TRIGGERED ----');
   try {
     const db = getDB();
     const selected = req.body.selected;
