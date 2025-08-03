@@ -1,5 +1,6 @@
 const { getDB } = require("../db/mongoClient");
 
+// Function to log changes to the database
 async function logChange({ action, collection, document_id, oldData, newData, user }) {
   try {
     const db = getDB();
@@ -19,6 +20,7 @@ async function logChange({ action, collection, document_id, oldData, newData, us
   }
 }
 
+// Function to get differences between old and new data
 function getDifferences(oldData, newData) {
   const diffs = [];
 

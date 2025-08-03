@@ -44,7 +44,7 @@ const uploadRoutes = require("./routes/uploadRoutes");
 app.use("/api/files", uploadRoutes);
 
 const exportRoutes = require("./routes/exportRoutes");
-app.use("/export", require("./routes/exportRoutes"));
+app.use("/export", exportRoutes);
 
 const convertRoutes = require("./routes/convertRoutes");
 app.use("/api/convert", convertRoutes);

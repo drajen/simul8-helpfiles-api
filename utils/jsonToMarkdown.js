@@ -16,7 +16,7 @@ function convertToMarkdown(helpFile) {
   /* if (section.section_title?.toLowerCase() !== "main") {
       md += `## ${section.section_title || "No title"}\n\n`;
     } */
-   
+
    const title = section.section_title?.trim();
     if (title && title.toLowerCase() !== "main") {
       md += `## ${title}\n\n`;
@@ -29,6 +29,7 @@ function convertToMarkdown(helpFile) {
     // Add media references
     if (section.media_references?.length) {
     section.media_references.forEach((media) => {
+
         // Use media.url if present, fallback to reconstruct from file_path
         const mediaUrl = media.url || `https://www.simul8.com/support/help/lib/exe/fetch.php?media=${media.file_path || media.media_id}`;
         const isImage = /\.(png|jpe?g|gif|svg)$/i.test(mediaUrl);

@@ -1,6 +1,7 @@
 const { body } = require("express-validator");
 
-// Validation rules for Media File POST and PUT
+// Validation rules for Media Files
+// POST and PUT requests
 const validateMediaFiles = [
   body("media_id")
     .notEmpty().withMessage("media_id is required")

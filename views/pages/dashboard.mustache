@@ -142,6 +142,13 @@
           </button>
         </div>
       </form>
+      
+      <!-- Hidden Bulk Export Form -->
+      <form id="bulk-export-form" method="POST" action="/export/bulk" style="display:none;">
+        <input type="hidden" name="format" id="export-format">
+        <input type="hidden" name="ids" id="export-ids">
+      </form>
+
 
       <!-- Pagination -->
       {{#totalPages}}
@@ -394,36 +401,42 @@
 </script>
 
 <script>
+  // Show export modal
   document.getElementById("export-selected-btn")?.addEventListener("click", () => {
     $('#exportConfirmModal').modal('show');
   });
 
+  // Get all selected checkbox values
   const getSelectedIds = () => {
-    const selected = Array.from(document.querySelectorAll('input[name="selected[]"]:checked'));
+    const selected = Array.from(
+      document.querySelectorAll('input[name="selected[]"]:checked')
+    );
     if (selected.length > 10) {
       alert("You can only export up to 10 files at a time.");
-      return [];
+      return null; 
     }
     return selected.map(cb => cb.value);
   };
 
-  const triggerExport = (format) => {
+  // Trigger bulk export
+  const triggerBulkExport = (format) => {
     const ids = getSelectedIds();
-    if (!ids.length) return;
+    if (ids.length === 0) {
+      alert("No items selected for export!");
+      return;
+    }
 
-    ids.forEach(id => {
-      const link = document.createElement("a");
-      link.href = `/export/helpfile/${format}/${encodeURIComponent(id)}`;
-      link.target = "_blank";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    });
-
-    $('#exportConfirmModal').modal('hide');
-    alert("Export started in new tabs!");
+    // Fill hidden form and submit
+    document.getElementById("export-format").value = format;
+    document.getElementById("export-ids").value = JSON.stringify(ids);
+    document.getElementById("bulk-export-form").submit();
   };
 
-  document.getElementById("export-md")?.addEventListener("click", () => triggerExport("markdown"));
-  document.getElementById("export-json")?.addEventListener("click", () => triggerExport("json"));
+  document.getElementById("export-md")?.addEventListener("click", () => {
+    triggerBulkExport("md");
+  });
+
+  document.getElementById("export-json")?.addEventListener("click", () => {
+    triggerBulkExport("json");
+  });
 </script>

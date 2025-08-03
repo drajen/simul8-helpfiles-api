@@ -1,3 +1,4 @@
+// Parses Markdown to a HelpFile JSON object
 function parseMarkdownToHelpFile(markdownText) {
   const lines = markdownText.split('\n');
   const helpFile = {
@@ -23,7 +24,7 @@ function parseMarkdownToHelpFile(markdownText) {
         currentSection.media_references.push({
           alt_text: match[1],
           media_id: match[2].split('media=')[1],
-          type: 'image', // 
+          type: 'image',
         });
       }
     } else if (currentSection) {

@@ -1,7 +1,7 @@
-// /middleware/validators/helpFileValidator.js
 const { body } = require('express-validator');
 
-// Validation rules for creating or updating a Help File
+// Validation rules for Help Files
+// POST and PUT requests
 const helpFilesValidationRules = [
   body('document_id')
     .notEmpty().withMessage('document_id is required')
